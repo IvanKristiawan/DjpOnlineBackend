@@ -1,0 +1,238 @@
+### Register
+POST http://localhost:5000/auth/register
+Content-Type: application/json
+
+{
+    // Data Utama
+    "npwp15":"84.467.024.0-542.000",
+    "nikNpwp16":"0844670240542000",
+    "nitku":"0844670240542000000000",
+    "nama":"MITRA KREASINDO",
+    "jenisUsaha":"INDUSTRI PENCETAKAN UMUM",
+    "bentukBadan":"PERSEROAN KOMANDITER",
+    // Data Lainnya
+    "alamat":"JL. JANTI GG PACE NO 2A, CATURTUNGGAL, DEPOK, KAB. SLEMAN, DAERAH ISTIMEWA YOGYAKARTA, 55598",
+    "nomorTelepon":"6285292054037",
+    "email":"mitrakreasindoworld@gmail.com",
+    // Info Perpajakan
+    "kppAdministrasi":"KPP PRATAMA SLEMAN",
+    "noTeleponKpp":"(0274) 4333940",
+    "accountRepresentative":"GAET PRIYANTO",
+    "statusWp":"AKTIF",
+    "statusPkp":"NON PKP",
+    // Identitas Penanggung Jawab
+    "namaPenanggungJawab":"ASMERI",
+    "nikPenanggungJawab":"1403014410936037",
+    "npwpPenanggungJawab":"83.680.651.3-219.000",
+    "jabatanPenanggungJawab":"KOMISARIS",
+    "kebangsaanPenanggungJawab":"WNI",
+    "alamatPjBadanPenanggungJawab":"JL. DAMON 1, 066, DAMON, BENGKALIS, KAB. BENGKALIS, RIAU, 28713",
+    // Dokumen Pendirian
+    "nomorAkta":"19",
+    "tempatAkta":"Yogyakarta",
+    "namaNotaris":"Theresi Pusvita Dewi, SH",
+    "nomorAktaPerubahan":"",
+    "password": "PASSWORD",
+    "tipeUser": "ADMIN",
+    "cabangId": "001",
+    "akses": {
+      "eBupot2126": true
+    },
+    "kewajibanPerpajakan": {
+      "pphPasal25": true
+    },
+    "_id": 35,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
+}
+
+### Login
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+    "username":"MANAGER",
+    "password": "MGR"
+}
+
+### Get All User
+POST http://localhost:5000/users
+Content-Type: application/json
+
+{
+    "_id": 35,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
+}
+
+### Get User By Id
+POST http://localhost:5000/findUser/1
+Content-Type: application/json
+
+{
+    "_id": 35,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
+}
+
+### Save Hak Akses 
+POST http://localhost:5000/saveHakAkses
+Content-Type: application/json
+
+{
+      "jaminan": true,
+      "marketing": true,
+      "bukuBesar": true,
+      "area": true,
+      "customer": true,
+      "cabang": true,
+      "profilUser": true,
+      "daftarUser": true,
+      "tutupPeriode": true,
+      "gantiPeriode": true,
+      "setting": true,
+      "pengajuan": true,
+      "approval": true,
+      "buktiPencairan": true,
+      "topup": true,
+      "kasMasuk": true,
+      "kasKeluar": true,
+      "bankMasuk": true,
+      "bankKeluar": true,
+    "userId": 14,
+    "_id": 35,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
+}
+
+### Update User 
+POST http://localhost:5000/users/1
+Content-Type: application/json
+
+{
+    "namaPeriode": "SEPTEMBER 2022",
+    "akses": {
+      "jaminan": true,
+      "marketing": true,
+      "bukuBesar": true,
+      "area": true,
+      "customer": true,
+      "cabang": true,
+      "profilUser": true,
+      "daftarUser": true,
+      "tutupPeriode": true,
+      "gantiPeriode": true,
+      "setting": true,
+      "pengajuan": true,
+      "approval": true,
+      "buktiPencairan": true,
+      "topup": true,
+      "kasMasuk": true,
+      "kasKeluar": true,
+      "bankMasuk": true,
+      "bankKeluar": true
+    },
+    "_id": 35,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
+}
+
+### Update User Then Login
+POST http://localhost:5000/updateUserThenLogin/1
+Content-Type: application/json
+
+{
+    "namaPeriode": "SEPTEMBER 2022",
+    "_id": 35,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
+}
+
+### Delete User
+POST http://localhost:5000/users/deleteUser/15
+Content-Type: application/json
+
+{
+    "_id": 35,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
+}
+
+### Get User By Username
+POST http://localhost:5000/getUsername
+Content-Type: application/json
+
+{
+    "username": "MANAGER",
+    "_id": 35,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
+}
+
+### Get User By Cabang Id
+POST http://localhost:5000/usersPerCabang
+Content-Type: application/json
+
+{
+    "kodeCabang": "001",
+    "_id": 35,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
+}
+
+### Find All Cabang
+POST http://localhost:5000/cabangs
+Content-Type: application/json
+
+{
+    "_id": 35,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
+}
+
+### Find Cabang Next Kode
+POST http://localhost:5000/cabangNextKode
+Content-Type: application/json
+
+{
+    "_id": 35,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
+}
+
+### Find Cabang By Id
+POST http://localhost:5000/cabangs/001
+Content-Type: application/json
+
+{
+    "_id": 35,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
+}
+
+### Save Cabang
+POST http://localhost:5000/saveCabang
+Content-Type: application/json
+
+{
+    "namaCabang":"PERUSAHAAN A",
+    "alamatCabang": "JL. A",
+    "teleponCabang": "08943214343",
+    "picCabang": "BAYU",
+    "_id": 35,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
+}
+
+### Update Cabang
+POST http://localhost:5000/updateCabang/002
+Content-Type: application/json
+
+{
+    "namaCabang":"CABANG C",
+    "alamatCabang": "JL. B",
+    "teleponCabang": "0894321",
+    "picCabang": "YUYU",
+    "_id": 35,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
+}
+
+### Delete Cabang
+POST http://localhost:5000/deleteCabang/002
+Content-Type: application/json
+
+{
+    "namaCabang":"CABANG B",
+    "alamatCabang": "JL. B",
+    "teleponCabang": "0894321",
+    "picCabang": "YUYU",
+    "_id": 35,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
+}
