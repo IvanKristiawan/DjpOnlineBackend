@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
     // Data Utama
-    "npwp15":"84.467.024.0-542.000",
+    "npwp15":"844670240542000",
     "nikNpwp16":"0844670240542000",
     "nitku":"0844670240542000000000",
     "nama":"MITRA KREASINDO",

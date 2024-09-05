@@ -56,14 +56,14 @@ const login = async (req, res, next) => {
   try {
     const user = await User.findOne({
       where: {
-        username: req.body.username,
+        npwp15: req.body.npwp15,
       },
       include: [{ model: Cabang }],
     });
     if (!user) return next(createError(404, "User not found!"));
 
     if (req.body.password !== user.password) {
-      return next(createError(400, "Username atau Password Salah!"));
+      return next(createError(400, "NPWP atau Password Salah!"));
     }
 
     const token = jwt.sign({ id: user.id }, process.env.JWT, {
