@@ -10,11 +10,6 @@ const register = async (req, res) => {
   let transaction;
   try {
     transaction = await sequelize.transaction();
-    Object.keys(req.body).forEach(function (k) {
-      if (typeof req.body[k] == "string") {
-        req.body[k] = req.body[k].toUpperCase().trim();
-      }
-    });
 
     const newUser = await User.create(
       {
