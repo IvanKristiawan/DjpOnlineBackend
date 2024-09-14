@@ -106,6 +106,38 @@ const HakAkses = sequelize.define(
       allowNull: false,
     },
 
+    // MASTER
+    kategoriKlu: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    golonganPokokKlu: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    golonganKlu: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    subGolonganKlu: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    kelompokKegiatanEkonomiKlu: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    cabang: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+
     // UTILITY
     profilUser: {
       type: DataTypes.BOOLEAN,

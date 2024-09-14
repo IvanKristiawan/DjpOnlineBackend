@@ -1,5 +1,6 @@
 const { Sequelize } = require("sequelize");
 const { sequelize } = require("../../config/Database.js");
+const KelompokKegiatanEkonomiKlu = require("../../Master/models/KelompokKegiatanEkonomiKlu/KelompokKegiatanEkonomiKluModel.js");
 const Cabang = require("../../Master/models/Cabang/CabangModel.js");
 
 const { DataTypes } = Sequelize;
@@ -27,10 +28,6 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    jenisUsaha: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     bentukBadan: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -51,6 +48,12 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       defaultValue: "",
       allowNull: true,
+    },
+
+    // Data KLU
+    kelompokKegiatanEkonomiKluId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
 
     // Info Perpajakan
@@ -155,6 +158,11 @@ const User = sequelize.define(
     freezeTableName: true,
   }
 );
+
+User.belongsTo(KelompokKegiatanEkonomiKlu, {
+  foreignKey: "kelompokKegiatanEkonomiKluId",
+  targetKey: "id",
+});
 
 User.belongsTo(Cabang, {
   foreignKey: "cabangId",

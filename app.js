@@ -11,7 +11,14 @@ const AuthRoute = require("./User/routes/AuthRoute.js");
 // Import Setting
 const SettingRoute = require("./Setting/routes/SettingRoute.js");
 // Import Master
+const KategoriKluRoute = require("./Master/routes/KategoriKlu/KategoriKluRoute.js");
+const GolonganPokokKluRoute = require("./Master/routes/GolonganPokokKlu/GolonganPokokKluRoute.js");
+const GolonganKluRoute = require("./Master/routes/GolonganKlu/GolonganKluRoute.js");
+const SubGolonganKluRoute = require("./Master/routes/SubGolonganKlu/SubGolonganKluRoute.js");
+const KelompokKegiatanEkonomiKluRoute = require("./Master/routes/KelompokKegiatanEkonomiKlu/KelompokKegiatanEkonomiKluRoute.js");
 const CabangRoute = require("./Master/routes/Cabang/CabangRoute.js");
+// Import Setting
+const MigrasiRoute = require("./Migrasi/routes/MigrasiRoute.js");
 
 const app = express();
 app.use(cors());
@@ -25,6 +32,13 @@ app.use("/auth", AuthRoute);
 // Setting
 app.use(SettingRoute);
 // Master
+app.use(KategoriKluRoute);
+app.use(GolonganPokokKluRoute);
+app.use(GolonganKluRoute);
+app.use(SubGolonganKluRoute);
+app.use(KelompokKegiatanEkonomiKluRoute);
 app.use(CabangRoute);
+// Migrasi
+app.use(MigrasiRoute);
 
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

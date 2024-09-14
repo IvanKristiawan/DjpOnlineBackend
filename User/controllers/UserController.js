@@ -2,15 +2,12 @@ const { sequelize } = require("../../config/Database.js");
 const Op = sequelize.Sequelize.Op;
 const User = require("../models/UserModel.js");
 const HakAkses = require("../models/HakAkses/HakAksesModel.js");
+const KewajibanPerpajakan = require("../models/KewajibanPerpajakan/KewajibanPerpajakanModel.js");
+const KelompokKegiatanEkonomiKlu = require("../../Master/models/KelompokKegiatanEkonomiKlu/KelompokKegiatanEkonomiKluModel.js");
 const Cabang = require("../../Master/models/Cabang/CabangModel.js");
 const jwt = require("jsonwebtoken");
 
 const updateUser = async (req, res) => {
-  Object.keys(req.body).forEach(function (k) {
-    if (typeof req.body[k] == "string") {
-      req.body[k] = req.body[k].toUpperCase().trim();
-    }
-  });
   let transaction;
   try {
     transaction = await sequelize.transaction();
@@ -27,9 +24,16 @@ const updateUser = async (req, res) => {
       tempPassword = findUser.password;
     }
 
+    let kelompokKegiatanEkonomiKlus = await KelompokKegiatanEkonomiKlu.findOne({
+      where: {
+        kodeKelompokKegiatanEkonomiKlu: req.body.kodeKelompokKegiatanEkonomiKlu,
+      },
+    });
+
     await User.update(
       {
         ...req.body,
+        kelompokKegiatanEkonomiKluId: kelompokKegiatanEkonomiKlus.id,
         password: tempPassword,
         cabangId: req.body.cabangId,
         akses: JSON.stringify(req.body.akses),
@@ -41,6 +45,115 @@ const updateUser = async (req, res) => {
         transaction,
       }
     );
+
+    await HakAkses.update(
+      { ...req.body.akses },
+      {
+        where: {
+          userId: req.params.id,
+        },
+        transaction,
+      }
+    );
+
+    await KewajibanPerpajakan.update(
+      { ...req.body.kewajibanPerpajakan },
+      {
+        where: {
+          userId: req.params.id,
+        },
+        transaction,
+      }
+    );
+
+    findUser = await User.findOne({
+      where: {
+        id: req.params.id,
+      },
+      include: [{ model: Cabang }],
+    });
+
+    const hakAkses = await HakAkses.findOne({
+      where: {
+        userId: req.params.id,
+      },
+    });
+
+    const kewajibanPerpajakan = await KewajibanPerpajakan.findOne({
+      where: {
+        userId: req.params.id,
+      },
+    });
+
+    const { ...otherDetails } = findUser.dataValues;
+
+    await transaction.commit();
+    res.status(200).json({
+      ...otherDetails,
+      akses: hakAkses,
+      kewajibanPerpajakan,
+    });
+  } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const updateUserPassword = async (req, res) => {
+  let transaction;
+  try {
+    transaction = await sequelize.transaction();
+    let findUser;
+    findUser = await User.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
+
+    if (req.body.passwordLama === findUser.password) {
+      await User.update(
+        {
+          password: req.body.password,
+        },
+        {
+          where: {
+            id: req.params.id,
+          },
+          transaction,
+        }
+      );
+
+      await transaction.commit();
+      res.status(200).json({ message: "User Updated!" });
+    } else {
+      if (transaction) {
+        await transaction.rollback();
+      }
+      // Error 400 = Kesalahan dari sisi user
+      res.status(400).json({ message: "Password lama berbeda!" });
+    }
+  } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const updateUserHakAkses = async (req, res) => {
+  let transaction;
+  try {
+    transaction = await sequelize.transaction();
+    let findUser;
+    findUser = await User.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
 
     await HakAkses.update(
       { ...req.body.akses },
@@ -65,12 +178,19 @@ const updateUser = async (req, res) => {
       },
     });
 
+    const kewajibanPerpajakan = await KewajibanPerpajakan.findOne({
+      where: {
+        userId: req.params.id,
+      },
+    });
+
     const { ...otherDetails } = findUser.dataValues;
 
     await transaction.commit();
     res.status(200).json({
       ...otherDetails,
       akses: hakAkses,
+      kewajibanPerpajakan,
     });
   } catch (error) {
     if (transaction) {
@@ -82,11 +202,6 @@ const updateUser = async (req, res) => {
 };
 
 const updateUserThenLogin = async (req, res) => {
-  Object.keys(req.body).forEach(function (k) {
-    if (typeof req.body[k] == "string") {
-      req.body[k] = req.body[k].toUpperCase().trim();
-    }
-  });
   let transaction;
   try {
     transaction = await sequelize.transaction();
@@ -103,9 +218,16 @@ const updateUserThenLogin = async (req, res) => {
       tempPassword = findUser.password;
     }
 
+    let kelompokKegiatanEkonomiKlus = await KelompokKegiatanEkonomiKlu.findOne({
+      where: {
+        kodeKelompokKegiatanEkonomiKlu: req.body.kodeKelompokKegiatanEkonomiKlu,
+      },
+    });
+
     await User.update(
       {
         ...req.body,
+        kelompokKegiatanEkonomiKluId: kelompokKegiatanEkonomiKlus.id,
         password: tempPassword,
         cabangId: req.body.cabangId,
         akses: JSON.stringify(req.body.akses),
@@ -131,7 +253,7 @@ const updateUserThenLogin = async (req, res) => {
       where: {
         id: req.params.id,
       },
-      include: [{ model: Cabang }],
+      include: [{ model: KelompokKegiatanEkonomiKlu }, { model: Cabang }],
     });
 
     const hakAkses = await HakAkses.findOne({
@@ -167,6 +289,12 @@ const deleteUser = async (req, res) => {
   let transaction;
   try {
     transaction = await sequelize.transaction();
+    await KewajibanPerpajakan.destroy({
+      where: {
+        userId: req.params.id,
+      },
+      transaction,
+    });
     await HakAkses.destroy({
       where: {
         userId: req.params.id,
@@ -205,17 +333,23 @@ const getUser = async (req, res) => {
       where: {
         id: req.params.id,
       },
-      include: [{ model: Cabang }],
+      include: [{ model: KelompokKegiatanEkonomiKlu }, { model: Cabang }],
     });
     const hakAkses = await HakAkses.findOne({
       where: {
         userId: req.params.id,
       },
     });
+    const kewajibanPerpajakan = await KewajibanPerpajakan.findOne({
+      where: {
+        userId: user.dataValues.id,
+      },
+    });
     const { ...otherDetails } = user.dataValues;
     res.status(200).json({
       ...otherDetails,
       akses: hakAkses,
+      kewajibanPerpajakan,
     });
   } catch (error) {
     // Error 500 = Kesalahan di server
@@ -227,7 +361,7 @@ const getUsers = async (req, res) => {
   try {
     let tempAllUser = [];
     const users = await User.findAll({
-      include: [{ model: Cabang }],
+      include: [{ model: KelompokKegiatanEkonomiKlu }, { model: Cabang }],
     });
 
     for (let user of users) {
@@ -259,7 +393,7 @@ const getUsersPagination = async (req, res) => {
   let tempWhere = {
     [Op.or]: [
       {
-        username: {
+        nama: {
           [Op.like]: "%" + search + "%",
         },
       },
@@ -281,6 +415,7 @@ const getUsersPagination = async (req, res) => {
     ],
   };
   let tempInclude = [
+    { model: KelompokKegiatanEkonomiKlu },
     {
       model: Cabang,
       as: "cabang",
@@ -329,14 +464,14 @@ const getUsersPagination = async (req, res) => {
   }
 };
 
-const getUsername = async (req, res) => {
+const getNama = async (req, res) => {
   try {
     let tempAllUser = [];
     const users = await User.findAll({
       where: {
-        username: req.body.username,
+        nama: req.body.nama,
       },
-      include: [{ model: Cabang }],
+      include: [{ model: KelompokKegiatanEkonomiKlu }, { model: Cabang }],
     });
 
     for (let user of users) {
@@ -367,7 +502,7 @@ const getUsersPerCabang = async (req, res) => {
       where: {
         cabangId: req.body.kodeCabang,
       },
-      include: [{ model: Cabang }],
+      include: [{ model: KelompokKegiatanEkonomiKlu }, { model: Cabang }],
     });
 
     for (let user of users) {
@@ -400,7 +535,12 @@ const getUsersPerCabangPagination = async (req, res) => {
     cabangId: req.body.kodeCabang,
     [Op.or]: [
       {
-        username: {
+        npwp15: {
+          [Op.like]: "%" + search + "%",
+        },
+      },
+      {
+        nama: {
           [Op.like]: "%" + search + "%",
         },
       },
@@ -422,6 +562,7 @@ const getUsersPerCabangPagination = async (req, res) => {
     ],
   };
   let tempInclude = [
+    { model: KelompokKegiatanEkonomiKlu },
     {
       model: Cabang,
       as: "cabang",
@@ -449,10 +590,16 @@ const getUsersPerCabangPagination = async (req, res) => {
           userId: user.dataValues.id,
         },
       });
+      const kewajibanPerpajakan = await KewajibanPerpajakan.findOne({
+        where: {
+          userId: user.dataValues.id,
+        },
+      });
       const { ...otherDetails } = user.dataValues;
       let objectUser = {
         ...otherDetails,
         akses: hakAkses,
+        kewajibanPerpajakan,
       };
       tempAllUser.push(objectUser);
     }
@@ -482,7 +629,7 @@ const getUsersPerCabangExceptOwnerPagination = async (req, res) => {
     },
     [Op.or]: [
       {
-        username: {
+        nama: {
           [Op.like]: "%" + search + "%",
         },
       },
@@ -504,6 +651,7 @@ const getUsersPerCabangExceptOwnerPagination = async (req, res) => {
     ],
   };
   let tempInclude = [
+    { model: KelompokKegiatanEkonomiKlu },
     {
       model: Cabang,
       as: "cabang",
@@ -554,12 +702,14 @@ const getUsersPerCabangExceptOwnerPagination = async (req, res) => {
 
 module.exports = {
   updateUser,
+  updateUserPassword,
+  updateUserHakAkses,
   updateUserThenLogin,
   deleteUser,
   getUser,
   getUsers,
   getUsersPagination,
-  getUsername,
+  getNama,
   getUsersPerCabang,
   getUsersPerCabangPagination,
   getUsersPerCabangExceptOwnerPagination,

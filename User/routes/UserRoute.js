@@ -2,12 +2,14 @@ const express = require("express");
 const content = require("../controllers/UserController.js");
 const content2 = require("../../utils/verifyToken.js");
 const updateUser = content.updateUser;
+const updateUserPassword = content.updateUserPassword;
+const updateUserHakAkses = content.updateUserHakAkses;
 const updateUserThenLogin = content.updateUserThenLogin;
 const deleteUser = content.deleteUser;
 const getUser = content.getUser;
 const getUsers = content.getUsers;
 const getUsersPagination = content.getUsersPagination;
-const getUsername = content.getUsername;
+const getNama = content.getNama;
 const getUsersPerCabang = content.getUsersPerCabang;
 const getUsersPerCabangPagination = content.getUsersPerCabangPagination;
 const getUsersPerCabangExceptOwnerPagination =
@@ -17,6 +19,8 @@ const router = express.Router();
 
 // UPDATE
 router.post("/users/:id", verifyUser, updateUser);
+router.post("/updateUserPassword/:id", verifyUser, updateUserPassword);
+router.post("/updateUserHakAkses/:id", verifyUser, updateUserHakAkses);
 router.post("/updateUserThenLogin/:id", verifyUser, updateUserThenLogin);
 // DELETE
 router.post("/users/deleteUser/:id", verifyUser, deleteUser);
@@ -25,7 +29,7 @@ router.post("/findUser/:id", verifyUser, getUser);
 // GET ALL
 router.post("/users", verifyUser, getUsers);
 router.post("/usersPagination", verifyUser, getUsersPagination);
-router.post("/getUsername", verifyUser, getUsername);
+router.post("/getNama", verifyUser, getNama);
 router.post("/usersPerCabang", verifyUser, getUsersPerCabang);
 router.post(
   "/usersPerCabangPagination",

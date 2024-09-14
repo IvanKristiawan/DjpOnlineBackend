@@ -1,7 +1,9 @@
 const { sequelize } = require("../../config/Database.js");
+const Op = sequelize.Sequelize.Op;
 const User = require("../models/UserModel.js");
 const HakAkses = require("../models/HakAkses/HakAksesModel.js");
 const KewajibanPerpajakan = require("../models/KewajibanPerpajakan/KewajibanPerpajakanModel.js");
+const KelompokKegiatanEkonomiKlu = require("../../Master/models/KelompokKegiatanEkonomiKlu/KelompokKegiatanEkonomiKluModel.js");
 const Cabang = require("../../Master/models/Cabang/CabangModel.js");
 const { createError } = require("../../utils/error.js");
 const jwt = require("jsonwebtoken");
@@ -11,9 +13,16 @@ const register = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
 
+    let kelompokKegiatanEkonomiKlus = await KelompokKegiatanEkonomiKlu.findOne({
+      where: {
+        kodeKelompokKegiatanEkonomiKlu: req.body.kodeKelompokKegiatanEkonomiKlu,
+      },
+    });
+
     const newUser = await User.create(
       {
         ...req.body,
+        kelompokKegiatanEkonomiKluId: kelompokKegiatanEkonomiKlus.id,
         password: req.body.password,
         cabangId: req.body.cabangId,
       },
@@ -53,7 +62,7 @@ const login = async (req, res, next) => {
       where: {
         npwp15: req.body.npwp15,
       },
-      include: [{ model: Cabang }],
+      include: [{ model: KelompokKegiatanEkonomiKlu }, { model: Cabang }],
     });
     if (!user) return next(createError(404, "User not found!"));
 
@@ -93,7 +102,62 @@ const login = async (req, res, next) => {
   }
 };
 
+const loginAdmin = async (req, res, next) => {
+  try {
+    const user = await User.findOne({
+      where: {
+        nama: req.body.nama,
+        [Op.or]: [
+          {
+            tipeUser: "MANAGER",
+          },
+          {
+            tipeUser: "OWNER",
+          },
+        ],
+      },
+      include: [{ model: Cabang }],
+    });
+    if (!user) return next(createError(404, "User not found!"));
+
+    if (req.body.password !== user.password) {
+      return next(createError(400, "Nama atau Password Salah!"));
+    }
+
+    const token = jwt.sign({ id: user.id }, process.env.JWT, {
+      expiresIn: "15d",
+    });
+
+    const { password, ...otherDetails } = user.dataValues;
+
+    const hakAkses = await HakAkses.findOne({
+      where: {
+        userId: user.dataValues.id,
+      },
+    });
+
+    const kewajibanPerpajakan = await KewajibanPerpajakan.findOne({
+      where: {
+        userId: user.dataValues.id,
+      },
+    });
+
+    res.status(200).json({
+      details: {
+        ...otherDetails,
+        token,
+        akses: hakAkses,
+        kewajibanPerpajakan,
+      },
+    });
+  } catch (error) {
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
 module.exports = {
   register,
   login,
+  loginAdmin,
 };
