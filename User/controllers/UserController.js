@@ -285,6 +285,83 @@ const updateUserThenLogin = async (req, res) => {
   }
 };
 
+const updateUserThenLoginNoKewajiban = async (req, res) => {
+  let transaction;
+  try {
+    transaction = await sequelize.transaction();
+
+    const findUser = await User.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
+    let tempPassword;
+    if (req.body.password) {
+      tempPassword = req.body.password;
+    } else {
+      tempPassword = findUser.password;
+    }
+
+    await User.update(
+      {
+        ...req.body,
+        password: tempPassword,
+        cabangId: req.body.cabangId,
+        akses: JSON.stringify(req.body.akses),
+      },
+      {
+        where: {
+          id: req.params.id,
+        },
+      }
+    );
+
+    await HakAkses.update(
+      { ...req.body.akses },
+      {
+        where: {
+          userId: req.params.id,
+        },
+        transaction,
+      }
+    );
+
+    const user = await User.findOne({
+      where: {
+        id: req.params.id,
+      },
+      include: [{ model: KelompokKegiatanEkonomiKlu }, { model: Cabang }],
+    });
+
+    const hakAkses = await HakAkses.findOne({
+      where: {
+        userId: req.params.id,
+      },
+    });
+
+    const token = jwt.sign({ id: user.id }, process.env.JWT, {
+      expiresIn: "15d",
+    });
+
+    const { password, ...otherDetails } = user.dataValues;
+
+    await transaction.commit();
+    res.status(200).json({
+      details: {
+        ...otherDetails,
+        token,
+        akses: hakAkses,
+      },
+    });
+  } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
 const deleteUser = async (req, res) => {
   let transaction;
   try {
@@ -705,6 +782,7 @@ module.exports = {
   updateUserPassword,
   updateUserHakAkses,
   updateUserThenLogin,
+  updateUserThenLoginNoKewajiban,
   deleteUser,
   getUser,
   getUsers,
