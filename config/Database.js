@@ -8,15 +8,10 @@ const sequelize = new Sequelize("pajak_db", "root", "", {
 });
 
 // Akun MySql Hosting
-// const sequelize = new Sequelize(
-//   "mega5536_pajak",
-//   "mega5536_ivan",
-//   "pajakKu",
-//   {
-//     host: "127.0.0.1",
-//     dialect: "mysql",
-//   }
-// );
+// const sequelize = new Sequelize("baka3593_pajak", "baka3593_ivan", "password", {
+//   host: "127.0.0.1",
+//   dialect: "mysql",
+// });
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
