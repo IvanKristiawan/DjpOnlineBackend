@@ -16,6 +16,8 @@ const GolonganPokokKluRoute = require("./Master/routes/GolonganPokokKlu/Golongan
 const GolonganKluRoute = require("./Master/routes/GolonganKlu/GolonganKluRoute.js");
 const SubGolonganKluRoute = require("./Master/routes/SubGolonganKlu/SubGolonganKluRoute.js");
 const KelompokKegiatanEkonomiKluRoute = require("./Master/routes/KelompokKegiatanEkonomiKlu/KelompokKegiatanEkonomiKluRoute.js");
+const JenisPajakRoute = require("./Master/routes/JenisPajak/JenisPajakRoute.js");
+const JenisSetoranRoute = require("./Master/routes/JenisSetoran/JenisSetoranRoute.js");
 const CabangRoute = require("./Master/routes/Cabang/CabangRoute.js");
 // Import Setting
 const MigrasiRoute = require("./Migrasi/routes/MigrasiRoute.js");
@@ -37,6 +39,8 @@ app.use(GolonganPokokKluRoute);
 app.use(GolonganKluRoute);
 app.use(SubGolonganKluRoute);
 app.use(KelompokKegiatanEkonomiKluRoute);
+app.use(JenisPajakRoute);
+app.use(JenisSetoranRoute);
 app.use(CabangRoute);
 // Migrasi
 app.use(MigrasiRoute);
