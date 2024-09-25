@@ -12,7 +12,6 @@ const JenisSetoran = sequelize.define(
       type: DataTypes.STRING,
       default: "",
       allowNull: false,
-      unique: true,
     },
     namaJenisSetoran: {
       type: DataTypes.STRING,
