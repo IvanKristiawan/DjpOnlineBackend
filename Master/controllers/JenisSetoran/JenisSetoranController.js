@@ -51,6 +51,7 @@ const getJenisSetoransPagination = async (req, res) => {
     {
       model: JenisPajak,
       as: "jenispajak",
+      attributes: ["kodeJenisPajak", "namaJenisPajak"],
     },
     { model: Cabang },
   ];
@@ -66,7 +67,10 @@ const getJenisSetoransPagination = async (req, res) => {
       include: tempInclude,
       offset: offset,
       limit: limit,
-      order: [["kodeJenisSetoran", "ASC"]],
+      order: [
+        [JenisPajak, "kodeJenisPajak", "ASC"],
+        ["kodeJenisSetoran", "ASC"],
+      ],
     });
     res.status(200).json({
       jenisSetorans,

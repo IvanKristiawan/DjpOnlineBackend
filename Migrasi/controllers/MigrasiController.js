@@ -5,6 +5,9 @@ const GolonganKlu = require("../../Master/models/GolonganKlu/GolonganKluModel.js
 const SubGolonganKlu = require("../../Master/models/SubGolonganKlu/SubGolonganKluModel.js");
 const KelompokKegiatanEkonomiKlu = require("../../Master/models/KelompokKegiatanEkonomiKlu/KelompokKegiatanEkonomiKluModel.js");
 const Setting = require("../../Setting/models/SettingModel.js");
+const JenisPajak = require("../../Master/models/JenisPajak/JenisPajakModel.js");
+const Cabang = require("../../Master/models/Cabang/CabangModel.js");
+const JenisSetoran = require("../../Master/models/JenisSetoran/JenisSetoranModel.js");
 
 const migrasiKlu = async (req, res) => {
   Object.keys(req.body).forEach(function (k) {
@@ -171,6 +174,99 @@ const migrasiKlu = async (req, res) => {
   }
 };
 
+const migrasiJenisPajak = async (req, res) => {
+  Object.keys(req.body).forEach(function (k) {
+    if (typeof req.body[k] == "string") {
+      req.body[k] = req.body[k].toUpperCase().trim();
+    }
+  });
+  let transaction;
+
+  try {
+    transaction = await sequelize.transaction();
+
+    let unique = [];
+    let seen = new Set();
+
+    req.body.forEach((item) => {
+      // Create a unique identifier based on kdMap and descMap
+      let identifier = `${item.kdMap}-${item.descMap}`;
+      if (!seen.has(identifier)) {
+        seen.add(identifier);
+        unique.push({
+          kodeJenisPajak: item.kdMap,
+          namaJenisPajak: item.descMap,
+          cabangId: "001",
+          userIdInput: 5,
+        });
+      }
+    });
+
+    console.log(unique);
+
+    const insertedJenisPajak = await JenisPajak.bulkCreate(unique);
+
+    // Status 201 = Created
+    // await transaction.commit();
+    res.status(200).json(unique);
+    // res.status(200).json("Klu data migrated!");
+  } catch (error) {
+    console.log(error);
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const migrasiJenisSetoran = async (req, res) => {
+  Object.keys(req.body).forEach(function (k) {
+    if (typeof req.body[k] == "string") {
+      req.body[k] = req.body[k].toUpperCase().trim();
+    }
+  });
+  let transaction;
+
+  try {
+    transaction = await sequelize.transaction();
+
+    for (let i = 0; i < req.body.length; i++) {
+      const jenisPajak = await JenisPajak.findOne({
+        where: {
+          kodeJenisPajak: req.body[i].kdMap,
+        },
+        include: [{ model: Cabang }],
+      });
+
+      let dataJenisSetoran = {
+        ...req.body[i],
+        kodeJenisSetoran: req.body[i].kdSetor,
+        namaJenisSetoran: req.body[i].descSetor,
+        jenisPajakId: jenisPajak.id,
+        userIdInput: 5,
+        cabangId: "001",
+      };
+      console.log(dataJenisSetoran);
+
+      const insertedJenisSetoran = await JenisSetoran.create(dataJenisSetoran);
+    }
+
+    // Status 201 = Created
+    // await transaction.commit();
+    res.status(200).json("Jenis Setoran data migrated!");
+  } catch (error) {
+    console.log(error);
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
 module.exports = {
   migrasiKlu,
+  migrasiJenisPajak,
+  migrasiJenisSetoran,
 };
