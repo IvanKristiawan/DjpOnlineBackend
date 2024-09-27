@@ -20,6 +20,8 @@ const JenisPajakRoute = require("./Master/routes/JenisPajak/JenisPajakRoute.js")
 const JenisSetoranRoute = require("./Master/routes/JenisSetoran/JenisSetoranRoute.js");
 const TahunRoute = require("./Master/routes/Tahun/TahunRoute.js");
 const CabangRoute = require("./Master/routes/Cabang/CabangRoute.js");
+// Import EBilling
+const EBillingRoute = require("./EBilling/routes/EBilling/EBillingRoute.js");
 // Import Setting
 const MigrasiRoute = require("./Migrasi/routes/MigrasiRoute.js");
 
@@ -44,6 +46,8 @@ app.use(JenisPajakRoute);
 app.use(JenisSetoranRoute);
 app.use(TahunRoute);
 app.use(CabangRoute);
+// EBilling
+app.use(EBillingRoute);
 // Migrasi
 app.use(MigrasiRoute);
 
