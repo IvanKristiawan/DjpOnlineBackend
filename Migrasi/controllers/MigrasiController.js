@@ -8,6 +8,8 @@ const Setting = require("../../Setting/models/SettingModel.js");
 const JenisPajak = require("../../Master/models/JenisPajak/JenisPajakModel.js");
 const Cabang = require("../../Master/models/Cabang/CabangModel.js");
 const JenisSetoran = require("../../Master/models/JenisSetoran/JenisSetoranModel.js");
+const Tahun = require("../../Master/models/Tahun/TahunModel.js");
+const { findNextKode } = require("../../helper/helper.js");
 
 const migrasiKlu = async (req, res) => {
   Object.keys(req.body).forEach(function (k) {
@@ -265,8 +267,45 @@ const migrasiJenisSetoran = async (req, res) => {
   }
 };
 
+const migrasiTahun = async (req, res) => {
+  Object.keys(req.body).forEach(function (k) {
+    if (typeof req.body[k] == "string") {
+      req.body[k] = req.body[k].toUpperCase().trim();
+    }
+  });
+  let transaction;
+
+  try {
+    transaction = await sequelize.transaction();
+
+    let mulaiTahun = 1946;
+    let selesaiTahun = 2025;
+
+    for (mulaiTahun; mulaiTahun < selesaiTahun; mulaiTahun++) {
+      let nextTahun = findNextKode(mulaiTahun, 4);
+
+      const insertedTahun = await Tahun.create({
+        tahun: nextTahun,
+        cabangId: "001",
+      });
+    }
+
+    // Status 201 = Created
+    // await transaction.commit();
+    res.status(200).json("Tahun data migrated!");
+  } catch (error) {
+    console.log(error);
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
 module.exports = {
   migrasiKlu,
   migrasiJenisPajak,
   migrasiJenisSetoran,
+  migrasiTahun,
 };

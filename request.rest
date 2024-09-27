@@ -236,3 +236,7 @@ Content-Type: application/json
     "_id": 35,
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzUsImlhdCI6MTcyMTM3Nzk5OCwiZXhwIjoxNzIyNjczOTk4fQ.hZY4cNKiJvwsevtVhc5VarYZffHVv7l85YsoxpVCyDc"
 }
+
+### Migrasi Tahun
+POST http://localhost:5000/migrasiTahun
+Content-Type: application/json

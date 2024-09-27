@@ -2,6 +2,7 @@ const express = require("express");
 const controller = require("../../controllers/JenisSetoran/JenisSetoranController.js");
 const verify = require("../../../utils/verifyToken.js");
 const getJenisSetorans = controller.getJenisSetorans;
+const getJenisSetoransByJenisPajak = controller.getJenisSetoransByJenisPajak;
 const getJenisSetoransPagination = controller.getJenisSetoransPagination;
 const getJenisSetoranById = controller.getJenisSetoranById;
 const saveJenisSetoran = controller.saveJenisSetoran;
@@ -12,6 +13,11 @@ const verifyUser = verify.verifyUser;
 const router = express.Router();
 
 router.post("/jenisSetorans", verifyUser, getJenisSetorans);
+router.post(
+  "/jenisSetoransByJenisPajak",
+  verifyUser,
+  getJenisSetoransByJenisPajak
+);
 router.post("/jenisSetoransPagination", verifyUser, getJenisSetoransPagination);
 router.post("/jenisSetorans/:id", verifyUser, getJenisSetoranById);
 router.post("/saveJenisSetoran", verifyUser, saveJenisSetoran);

@@ -18,6 +18,22 @@ const getJenisSetorans = async (req, res) => {
   }
 };
 
+const getJenisSetoransByJenisPajak = async (req, res) => {
+  try {
+    const jenisSetorans = await JenisSetoran.findAll({
+      where: {
+        jenisPajakId: req.body.jenisPajakId,
+      },
+      order: [["kodeJenisSetoran", "ASC"]],
+      include: [{ model: JenisPajak }, { model: Cabang }],
+    });
+    res.status(200).json(jenisSetorans);
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getJenisSetoransPagination = async (req, res) => {
   const page = parseInt(req.query.page) || 0;
   const limit = parseInt(req.query.limit) || 10;
@@ -231,6 +247,7 @@ const deleteJenisSetoran = async (req, res) => {
 
 module.exports = {
   getJenisSetorans,
+  getJenisSetoransByJenisPajak,
   getJenisSetoransPagination,
   getJenisSetoranById,
   saveJenisSetoran,
