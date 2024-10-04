@@ -108,6 +108,12 @@ const EBilling = sequelize.define(
       allowNull: false,
     },
 
+    ntpnBilling: {
+      type: DataTypes.STRING,
+      default: "",
+      allowNull: true,
+    },
+
     userIdInput: {
       type: DataTypes.INTEGER,
       allowNull: true,
