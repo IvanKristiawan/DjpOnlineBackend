@@ -3,6 +3,8 @@ const controller = require("../../controllers/JenisSetoran/JenisSetoranControlle
 const verify = require("../../../utils/verifyToken.js");
 const getJenisSetorans = controller.getJenisSetorans;
 const getJenisSetoransByJenisPajak = controller.getJenisSetoransByJenisPajak;
+const getJenisSetoransByKodeJenisPajak =
+  controller.getJenisSetoransByKodeJenisPajak;
 const getJenisSetoransPagination = controller.getJenisSetoransPagination;
 const getJenisSetoranById = controller.getJenisSetoranById;
 const saveJenisSetoran = controller.saveJenisSetoran;
@@ -17,6 +19,11 @@ router.post(
   "/jenisSetoransByJenisPajak",
   verifyUser,
   getJenisSetoransByJenisPajak
+);
+router.post(
+  "/jenisSetoransByKodeJenisPajak",
+  verifyUser,
+  getJenisSetoransByKodeJenisPajak
 );
 router.post("/jenisSetoransPagination", verifyUser, getJenisSetoransPagination);
 router.post("/jenisSetorans/:id", verifyUser, getJenisSetoranById);

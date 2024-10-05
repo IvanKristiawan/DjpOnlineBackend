@@ -1,63 +1,82 @@
 const { Sequelize } = require("sequelize");
 const { sequelize } = require("../../../config/Database.js");
 const Op = sequelize.Sequelize.Op;
-const JenisPajak = require("../../models/JenisPajak/JenisPajakModel.js");
 const JenisSetoran = require("../../models/JenisSetoran/JenisSetoranModel.js");
+const ObjekPajak = require("../../models/ObjekPajak/ObjekPajakModel.js");
 const Cabang = require("../../models/Cabang/CabangModel.js");
+const JenisPajak = require("../../models/JenisPajak/JenisPajakModel.js");
 
-const getJenisSetorans = async (req, res) => {
+const getObjekPajaks = async (req, res) => {
   try {
-    const jenisSetorans = await JenisSetoran.findAll({
-      order: [["kodeJenisSetoran", "ASC"]],
-      include: [{ model: JenisPajak }, { model: Cabang }],
+    const objekPajaks = await ObjekPajak.findAll({
+      order: [["kodeObjekPajak", "ASC"]],
+      include: [{ model: JenisSetoran }, { model: Cabang }],
     });
-    res.status(200).json(jenisSetorans);
+    res.status(200).json(objekPajaks);
   } catch (error) {
     // Error 500 = Kesalahan di server
     res.status(500).json({ message: error.message });
   }
 };
 
-const getJenisSetoransByJenisPajak = async (req, res) => {
+const getObjekPajakNextKode = async (req, res) => {
   try {
-    const jenisSetorans = await JenisSetoran.findAll({
+    let maxObjekPajaks = await ObjekPajak.findOne({
       where: {
-        jenisPajakId: req.body.jenisPajakId,
+        "$jenissetoran.jenispajak.kodeJenisPajak$": req.body.kodeJenisPajak,
+        "$jenissetoran.kodeJenisSetoran$": req.body.kodeJenisSetoran,
       },
-      order: [["kodeJenisSetoran", "ASC"]],
-      include: [{ model: JenisPajak }, { model: Cabang }],
-    });
-    res.status(200).json(jenisSetorans);
-  } catch (error) {
-    // Error 500 = Kesalahan di server
-    res.status(500).json({ message: error.message });
-  }
-};
-
-const getJenisSetoransByKodeJenisPajak = async (req, res) => {
-  try {
-    const jenisSetorans = await JenisSetoran.findAll({
-      where: {
-        "$jenispajak.kodeJenisPajak$": req.body.kodeJenisPajak,
-      },
-      order: [["kodeJenisSetoran", "ASC"]],
       include: [
         {
-          model: JenisPajak,
-          as: "jenispajak",
-          attributes: ["kodeJenisPajak", "namaJenisPajak"],
+          model: JenisSetoran,
+          as: "jenissetoran",
+          attributes: ["kodeJenisSetoran", "namaJenisSetoran"],
+          include: [
+            {
+              model: JenisPajak,
+              as: "jenispajak",
+            },
+          ],
         },
-        { model: Cabang },
+      ],
+      order: [
+        ["kodeObjekPajak", "DESC"], // Order by 'kodeObjekPajak' in descending order to get the max value
       ],
     });
-    res.status(200).json(jenisSetorans);
+
+    let nextKodeObjekPajak = findNextKode(
+      parseInt(maxObjekPajaks.kodeObjekPajak.slice(-2)),
+      2
+    );
+
+    let createNewObjekPajak = `${req.body.kodeJenisPajak.slice(-2)}-${
+      req.body.kodeJenisSetoran
+    }-${nextKodeObjekPajak}`;
+
+    res.status(200).json(createNewObjekPajak);
   } catch (error) {
     // Error 500 = Kesalahan di server
     res.status(500).json({ message: error.message });
   }
 };
 
-const getJenisSetoransPagination = async (req, res) => {
+const getObjekPajaksByJenisSetoran = async (req, res) => {
+  try {
+    const objekPajaks = await ObjekPajak.findAll({
+      where: {
+        jenisSetoranId: req.body.jenisSetoranId,
+      },
+      order: [["kodeObjekPajak", "ASC"]],
+      include: [{ model: JenisSetoran }, { model: Cabang }],
+    });
+    res.status(200).json(objekPajaks);
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getObjekPajaksPagination = async (req, res) => {
   const page = parseInt(req.query.page) || 0;
   const limit = parseInt(req.query.limit) || 10;
   const search = req.query.search_query || "";
@@ -65,22 +84,32 @@ const getJenisSetoransPagination = async (req, res) => {
   let tempWhere = {
     [Op.or]: [
       {
-        kodeJenisSetoran: {
+        kodeObjekPajak: {
           [Op.like]: "%" + search + "%",
         },
       },
       {
-        namaJenisSetoran: {
+        namaObjekPajak: {
           [Op.like]: "%" + search + "%",
         },
       },
       {
-        "$jenispajak.kodeJenisPajak$": {
+        "$jenissetoran.kodeJenisSetoran$": {
           [Op.like]: "%" + search + "%",
         },
       },
       {
-        "$jenispajak.namaJenisPajak$": {
+        "$jenissetoran.namaJenisSetoran$": {
+          [Op.like]: "%" + search + "%",
+        },
+      },
+      {
+        "$jenissetoran.jenispajak.kodeJenisPajak$": {
+          [Op.like]: "%" + search + "%",
+        },
+      },
+      {
+        "$jenissetoran.jenispajak.namaJenisPajak$": {
           [Op.like]: "%" + search + "%",
         },
       },
@@ -88,31 +117,37 @@ const getJenisSetoransPagination = async (req, res) => {
   };
   let tempInclude = [
     {
-      model: JenisPajak,
-      as: "jenispajak",
-      attributes: ["kodeJenisPajak", "namaJenisPajak"],
+      model: JenisSetoran,
+      as: "jenissetoran",
+      attributes: ["kodeJenisSetoran", "namaJenisSetoran"],
+      include: [
+        {
+          model: JenisPajak,
+          as: "jenispajak",
+        },
+      ],
     },
     { model: Cabang },
   ];
 
-  const totalRows = await JenisSetoran.count({
+  const totalRows = await ObjekPajak.count({
     where: tempWhere,
     include: tempInclude,
   });
   const totalPage = Math.ceil(totalRows / limit);
   try {
-    const jenisSetorans = await JenisSetoran.findAll({
+    const objekPajaks = await ObjekPajak.findAll({
       where: tempWhere,
       include: tempInclude,
       offset: offset,
       limit: limit,
       order: [
-        [JenisPajak, "kodeJenisPajak", "ASC"],
-        ["kodeJenisSetoran", "ASC"],
+        [JenisSetoran, "kodeJenisSetoran", "ASC"],
+        ["kodeObjekPajak", "ASC"],
       ],
     });
     res.status(200).json({
-      jenisSetorans,
+      objekPajaks,
       page: page,
       limit: limit,
       totalRows: totalRows,
@@ -124,49 +159,62 @@ const getJenisSetoransPagination = async (req, res) => {
   }
 };
 
-const getJenisSetoranById = async (req, res) => {
+const getObjekPajakById = async (req, res) => {
   try {
-    const jenisSetoran = await JenisSetoran.findOne({
+    const objekPajak = await ObjekPajak.findOne({
       where: {
         id: req.params.id,
       },
-      include: [{ model: JenisPajak }, { model: Cabang }],
+      include: [
+        {
+          model: JenisSetoran,
+          include: [
+            {
+              model: JenisPajak,
+            },
+          ],
+        },
+        { model: Cabang },
+      ],
     });
-    res.status(200).json(jenisSetoran);
+    res.status(200).json(objekPajak);
   } catch (error) {
     // Error 404 = Not Found
     res.status(404).json({ message: error.message });
   }
 };
 
-const saveJenisSetoran = async (req, res) => {
-  Object.keys(req.body).forEach(function (k) {
-    if (typeof req.body[k] == "string") {
-      req.body[k] = req.body[k].toUpperCase().trim();
-    }
-  });
+const saveObjekPajak = async (req, res) => {
   let transaction;
 
   try {
     transaction = await sequelize.transaction();
 
-    let jenisPajaks = await JenisPajak.findOne({
+    let jenisSetorans = await JenisSetoran.findOne({
       where: {
-        kodeJenisPajak: req.body.kodeJenisPajak,
+        "$jenispajak.kodeJenisPajak$": req.body.kodeJenisPajak,
+        kodeJenisSetoran: req.body.kodeJenisSetoran,
       },
+      include: [
+        {
+          model: JenisPajak,
+          as: "jenispajak",
+          attributes: ["kodeJenisPajak", "namaJenisPajak"],
+        },
+      ],
     });
 
-    const insertedJenisSetoran = await JenisSetoran.create(
+    const insertedObjekPajak = await ObjekPajak.create(
       {
         ...req.body,
-        jenisPajakId: jenisPajaks.id,
+        jenisSetoranId: jenisSetorans.id,
         cabangId: req.body.kodeCabang,
       },
       { transaction }
     );
     // Status 201 = Created
     await transaction.commit();
-    res.status(201).json(insertedJenisSetoran);
+    res.status(201).json(insertedObjekPajak);
   } catch (error) {
     if (transaction) {
       await transaction.rollback();
@@ -180,26 +228,15 @@ const saveJenisSetoran = async (req, res) => {
   }
 };
 
-const updateJenisSetoran = async (req, res) => {
-  Object.keys(req.body).forEach(function (k) {
-    if (typeof req.body[k] == "string") {
-      req.body[k] = req.body[k].toUpperCase().trim();
-    }
-  });
+const updateObjekPajak = async (req, res) => {
   let transaction;
+
   try {
     transaction = await sequelize.transaction();
 
-    let jenisPajaks = await JenisPajak.findOne({
-      where: {
-        kodeJenisPajak: req.body.kodeJenisPajak,
-      },
-    });
-
-    await JenisSetoran.update(
+    await ObjekPajak.update(
       {
         ...req.body,
-        jenisPajakId: jenisPajaks.id,
         cabangId: req.body.kodeCabang,
       },
       {
@@ -212,14 +249,14 @@ const updateJenisSetoran = async (req, res) => {
       // num come from numbers of updated data
       if (num == 1) {
         await transaction.commit();
-        res.status(200).json({ message: "Jenis Setoran Updated!" });
+        res.status(200).json({ message: "Objek Pajak Updated!" });
       } else {
         if (transaction) {
           await transaction.rollback();
         }
         res
           .status(400)
-          .json({ message: `Jenis Setoran ${req.params.id} not found!` });
+          .json({ message: `Objek Pajak ${req.params.id} not found!` });
       }
     });
   } catch (error) {
@@ -236,11 +273,11 @@ const updateJenisSetoran = async (req, res) => {
   }
 };
 
-const deleteJenisSetoran = async (req, res) => {
+const deleteObjekPajak = async (req, res) => {
   let transaction;
   try {
     transaction = await sequelize.transaction();
-    await JenisSetoran.destroy({
+    await ObjekPajak.destroy({
       where: {
         id: req.params.id,
       },
@@ -249,14 +286,14 @@ const deleteJenisSetoran = async (req, res) => {
       // num come from numbers of updated data
       if (num == 1) {
         await transaction.commit();
-        res.status(200).json({ message: "Jenis Setoran Deleted!" });
+        res.status(200).json({ message: "Objek Pajak Deleted!" });
       } else {
         if (transaction) {
           await transaction.rollback();
         }
         res
           .status(400)
-          .json({ message: `Jenis Setoran ${req.params.id} not found!` });
+          .json({ message: `Objek Pajak ${req.params.id} not found!` });
       }
     });
   } catch (error) {
@@ -269,12 +306,12 @@ const deleteJenisSetoran = async (req, res) => {
 };
 
 module.exports = {
-  getJenisSetorans,
-  getJenisSetoransByJenisPajak,
-  getJenisSetoransByKodeJenisPajak,
-  getJenisSetoransPagination,
-  getJenisSetoranById,
-  saveJenisSetoran,
-  updateJenisSetoran,
-  deleteJenisSetoran,
+  getObjekPajaks,
+  getObjekPajakNextKode,
+  getObjekPajaksByJenisSetoran,
+  getObjekPajaksPagination,
+  getObjekPajakById,
+  saveObjekPajak,
+  updateObjekPajak,
+  deleteObjekPajak,
 };

@@ -142,6 +142,11 @@ const HakAkses = sequelize.define(
       defaultValue: false,
       allowNull: false,
     },
+    objekPajak: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
     tahun: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,

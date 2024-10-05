@@ -4,6 +4,7 @@ const migrasiKlu = controller.migrasiKlu;
 const migrasiJenisPajak = controller.migrasiJenisPajak;
 const migrasiJenisSetoran = controller.migrasiJenisSetoran;
 const migrasiTahun = controller.migrasiTahun;
+const migrasiObjekPajak = controller.migrasiObjekPajak;
 
 const router = express.Router();
 
@@ -11,5 +12,6 @@ const router = express.Router();
 // router.post("/migrasiJenisPajak", migrasiJenisPajak);
 // router.post("/migrasiJenisSetoran", migrasiJenisSetoran);
 // router.post("/migrasiTahun", migrasiTahun);
+// router.post("/migrasiObjekPajak", migrasiObjekPajak);
 
 module.exports = router;

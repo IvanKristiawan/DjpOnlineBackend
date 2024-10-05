@@ -87,7 +87,7 @@ const JenisSetoran = sequelize.define(
       allowNull: true,
     },
 
-    // Foreign Key Kategori Klu
+    // Foreign Key Jenis Pajak
     jenisPajakId: {
       type: DataTypes.INTEGER,
       allowNull: false,

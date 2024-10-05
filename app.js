@@ -18,6 +18,7 @@ const SubGolonganKluRoute = require("./Master/routes/SubGolonganKlu/SubGolonganK
 const KelompokKegiatanEkonomiKluRoute = require("./Master/routes/KelompokKegiatanEkonomiKlu/KelompokKegiatanEkonomiKluRoute.js");
 const JenisPajakRoute = require("./Master/routes/JenisPajak/JenisPajakRoute.js");
 const JenisSetoranRoute = require("./Master/routes/JenisSetoran/JenisSetoranRoute.js");
+const ObjekPajakRoute = require("./Master/routes/ObjekPajak/ObjekPajakRoute.js");
 const TahunRoute = require("./Master/routes/Tahun/TahunRoute.js");
 const CabangRoute = require("./Master/routes/Cabang/CabangRoute.js");
 // Import EBilling
@@ -44,6 +45,7 @@ app.use(SubGolonganKluRoute);
 app.use(KelompokKegiatanEkonomiKluRoute);
 app.use(JenisPajakRoute);
 app.use(JenisSetoranRoute);
+app.use(ObjekPajakRoute);
 app.use(TahunRoute);
 app.use(CabangRoute);
 // EBilling

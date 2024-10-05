@@ -1,4 +1,5 @@
 const { sequelize } = require("../../config/Database.js");
+const Op = sequelize.Sequelize.Op;
 const KategoriKlu = require("../../Master/models/KategoriKlu/KategoriKluModel.js");
 const GolonganPokokKlu = require("../../Master/models/GolonganPokokKlu/GolonganPokokKluModel.js");
 const GolonganKlu = require("../../Master/models/GolonganKlu/GolonganKluModel.js");
@@ -8,6 +9,7 @@ const Setting = require("../../Setting/models/SettingModel.js");
 const JenisPajak = require("../../Master/models/JenisPajak/JenisPajakModel.js");
 const Cabang = require("../../Master/models/Cabang/CabangModel.js");
 const JenisSetoran = require("../../Master/models/JenisSetoran/JenisSetoranModel.js");
+const ObjekPajak = require("../../Master/models/ObjekPajak/ObjekPajakModel.js");
 const Tahun = require("../../Master/models/Tahun/TahunModel.js");
 const { findNextKode } = require("../../helper/helper.js");
 
@@ -303,9 +305,68 @@ const migrasiTahun = async (req, res) => {
   }
 };
 
+const migrasiObjekPajak = async (req, res) => {
+  Object.keys(req.body).forEach(function (k) {
+    if (typeof req.body[k] == "string") {
+      req.body[k] = req.body[k].toUpperCase().trim();
+    }
+  });
+  let transaction;
+
+  try {
+    transaction = await sequelize.transaction();
+
+    for (let i = 0; i < req.body.length; i++) {
+      let parts = req.body[i].kodeObjekPajak.split("-"); // Split the string into ["24", "104", "02"]
+      let kodeJenisSetoran = parts[1];
+
+      const jenisSetoran = await JenisSetoran.findOne({
+        where: {
+          kodeJenisSetoran: kodeJenisSetoran,
+          "$jenispajak.kodeJenisPajak$": {
+            [Op.like]: req.body[i].jenisPajak,
+          },
+        },
+        include: [
+          {
+            model: JenisPajak,
+            as: "jenispajak",
+            attributes: ["kodeJenisPajak", "namaJenisPajak"],
+          },
+        ],
+      });
+
+      // console.log(req.body[i].kodeObjekPajak);
+      if (jenisSetoran) {
+        // console.log(jenisSetoran.dataValues);
+        const insertedObjekPajak = await ObjekPajak.create({
+          kodeObjekPajak: req.body[i].kodeObjekPajak,
+          namaObjekPajak: req.body[i].namaObjekPajak,
+          jenisSetoranId: jenisSetoran.id,
+          cabangId: "001",
+        });
+      } else {
+        // console.log(req.body[i].kodeObjekPajak);
+      }
+    }
+
+    // Status 201 = Created
+    // await transaction.commit();
+    res.status(200).json("Objek Pajak data migrated!");
+  } catch (error) {
+    console.log(error);
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
 module.exports = {
   migrasiKlu,
   migrasiJenisPajak,
   migrasiJenisSetoran,
   migrasiTahun,
+  migrasiObjekPajak,
 };
