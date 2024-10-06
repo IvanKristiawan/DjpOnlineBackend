@@ -23,6 +23,8 @@ const TahunRoute = require("./Master/routes/Tahun/TahunRoute.js");
 const CabangRoute = require("./Master/routes/Cabang/CabangRoute.js");
 // Import EBilling
 const EBillingRoute = require("./EBilling/routes/EBilling/EBillingRoute.js");
+// Import EBupot Unifikasi Pph Disetor Sendiri
+const EBupotUnifikasiPphDisetorSendiriRoute = require("./PraPelaporan/routes/EBupotUnifikasi/EBupotUnifikasiPphDisetorSendiri/EBupotUnifikasiPphDisetorSendiriRoute.js");
 // Import Setting
 const MigrasiRoute = require("./Migrasi/routes/MigrasiRoute.js");
 
@@ -50,6 +52,8 @@ app.use(TahunRoute);
 app.use(CabangRoute);
 // EBilling
 app.use(EBillingRoute);
+// Import EBupot Unifikasi Pph Disetor Sendiri
+app.use(EBupotUnifikasiPphDisetorSendiriRoute);
 // Migrasi
 app.use(MigrasiRoute);
 

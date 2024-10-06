@@ -5,7 +5,9 @@ const EBilling = require("../../models/EBilling/EBillingModel.js");
 const User = require("../../../User/models/UserModel.js");
 const JenisSetoran = require("../../../Master/models/JenisSetoran/JenisSetoranModel.js");
 const Tahun = require("../../../Master/models/Tahun/TahunModel.js");
+const JenisPajak = require("../../../Master/models/JenisPajak/JenisPajakModel.js");
 const Cabang = require("../../../Master/models/Cabang/CabangModel.js");
+const { findNextKode } = require("../../../helper/helper");
 
 const getEBillings = async (req, res) => {
   try {
@@ -72,6 +74,55 @@ const getEBillingsPagination = async (req, res) => {
   }
 };
 
+const getEBillingByNtpnUser = async (req, res) => {
+  try {
+    let year = req.body.tahunPajak; // Your given year as a string or number
+
+    // First date of the year (January 1st)
+    let firstDateOfYear = new Date(year, 0, 1); // Month is 0 for January
+
+    // Last date of the year (December 31st)
+    let lastDateOfYear = new Date(year, 11, 31); // Month is 11 for December
+
+    const eBilling = await EBilling.findOne({
+      where: {
+        ntpnBilling: req.body.ntpnBilling,
+        userIdInput: req.body.userIdInput,
+        pralapor: false,
+        [Op.and]: [
+          {
+            tanggalSetorKodeBilling: {
+              [Op.gte]: firstDateOfYear,
+            },
+          },
+          {
+            tanggalSetorKodeBilling: {
+              [Op.lte]: lastDateOfYear,
+            },
+          },
+        ],
+      },
+      include: [
+        { model: User },
+        {
+          model: JenisSetoran,
+          include: [
+            {
+              model: JenisPajak,
+            },
+          ],
+        },
+        { model: Tahun },
+        { model: Cabang },
+      ],
+    });
+    res.status(200).json(eBilling);
+  } catch (error) {
+    // Error 404 = Not Found
+    res.status(404).json({ message: error.message });
+  }
+};
+
 const getEBillingById = async (req, res) => {
   try {
     const eBilling = await EBilling.findOne({
@@ -110,6 +161,9 @@ const saveEBilling = async (req, res) => {
     // Find Next Month
     let masaAktifKodeBilling = addMonths(new Date(), 2);
 
+    // Find Tanggal Setor
+    let tanggalSetorKodeBilling = new Date();
+
     const insertedEBilling = await EBilling.create(
       {
         ...req.body,
@@ -118,6 +172,7 @@ const saveEBilling = async (req, res) => {
         tahunPajakId: req.body.tahunPajak,
         kodeBilling: nextKodeEBilling,
         masaAktifKodeBilling,
+        tanggalSetorKodeBilling,
         cabangId: req.body.kodeCabang,
       },
       { transaction }
@@ -218,6 +273,7 @@ const deleteEBilling = async (req, res) => {
 module.exports = {
   getEBillings,
   getEBillingsPagination,
+  getEBillingByNtpnUser,
   getEBillingById,
   saveEBilling,
   updateEBilling,

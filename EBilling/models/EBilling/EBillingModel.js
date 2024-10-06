@@ -107,11 +107,23 @@ const EBilling = sequelize.define(
       default: new Date(),
       allowNull: false,
     },
+    tanggalSetorKodeBilling: {
+      type: DataTypes.DATE,
+      default: new Date(),
+      allowNull: false,
+    },
 
     ntpnBilling: {
       type: DataTypes.STRING,
       default: "",
       allowNull: true,
+    },
+
+    // Lapor
+    pralapor: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
     },
 
     userIdInput: {
