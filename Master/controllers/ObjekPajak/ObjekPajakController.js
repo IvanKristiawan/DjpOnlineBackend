@@ -19,6 +19,22 @@ const getObjekPajaks = async (req, res) => {
   }
 };
 
+const getObjekPajaksBupot = async (req, res) => {
+  try {
+    const objekPajaks = await ObjekPajak.findAll({
+      where: {
+        kodeBupot: req.body.kodeBupot,
+      },
+      order: [["kodeObjekPajak", "ASC"]],
+      include: [{ model: JenisSetoran }, { model: Cabang }],
+    });
+    res.status(200).json(objekPajaks);
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getObjekPajakNextKode = async (req, res) => {
   try {
     let maxObjekPajaks = await ObjekPajak.findOne({
@@ -44,10 +60,12 @@ const getObjekPajakNextKode = async (req, res) => {
       ],
     });
 
-    let nextKodeObjekPajak = findNextKode(
-      parseInt(maxObjekPajaks.kodeObjekPajak.slice(-2)),
-      2
-    );
+    let lastKodeObjekPajak = 0;
+    if (maxObjekPajaks) {
+      lastKodeObjekPajak = maxObjekPajaks.kodeObjekPajak.slice(-2);
+    }
+
+    let nextKodeObjekPajak = findNextKode(parseInt(lastKodeObjekPajak), 2);
 
     let createNewObjekPajak = `${req.body.kodeJenisPajak.slice(-2)}-${
       req.body.kodeJenisSetoran
@@ -156,6 +174,31 @@ const getObjekPajaksPagination = async (req, res) => {
   } catch (error) {
     // Error 500 = Kesalahan di server
     res.status(500).json({ message: error.message });
+  }
+};
+
+const getObjekPajakByKode = async (req, res) => {
+  try {
+    const objekPajak = await ObjekPajak.findOne({
+      where: {
+        kodeObjekPajak: req.body.kodeObjekPajak,
+      },
+      include: [
+        {
+          model: JenisSetoran,
+          include: [
+            {
+              model: JenisPajak,
+            },
+          ],
+        },
+        { model: Cabang },
+      ],
+    });
+    res.status(200).json(objekPajak);
+  } catch (error) {
+    // Error 404 = Not Found
+    res.status(404).json({ message: error.message });
   }
 };
 
@@ -307,9 +350,11 @@ const deleteObjekPajak = async (req, res) => {
 
 module.exports = {
   getObjekPajaks,
+  getObjekPajaksBupot,
   getObjekPajakNextKode,
   getObjekPajaksByJenisSetoran,
   getObjekPajaksPagination,
+  getObjekPajakByKode,
   getObjekPajakById,
   saveObjekPajak,
   updateObjekPajak,

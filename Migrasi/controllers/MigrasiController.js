@@ -363,10 +363,88 @@ const migrasiObjekPajak = async (req, res) => {
   }
 };
 
+const updateTarifPersenObjekPajak = async (req, res) => {
+  Object.keys(req.body).forEach(function (k) {
+    if (typeof req.body[k] == "string") {
+      req.body[k] = req.body[k].toUpperCase().trim();
+    }
+  });
+  let transaction;
+
+  try {
+    transaction = await sequelize.transaction();
+
+    for (let i = 0; i < req.body.length; i++) {
+      await ObjekPajak.update(
+        {
+          tarifPersen: req.body[i].tarifPersen,
+        },
+        {
+          where: {
+            kodeObjekPajak: req.body[i].kodeObjekPajak,
+          },
+        }
+      );
+      console.log(i);
+    }
+
+    // Status 201 = Created
+    // await transaction.commit();
+    res.status(200).json("Objek Pajak data updated!");
+  } catch (error) {
+    console.log(error);
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const updateKodeBupotObjekPajak = async (req, res) => {
+  Object.keys(req.body).forEach(function (k) {
+    if (typeof req.body[k] == "string") {
+      req.body[k] = req.body[k].toUpperCase().trim();
+    }
+  });
+  let transaction;
+
+  try {
+    transaction = await sequelize.transaction();
+
+    for (let i = 0; i < req.body.length; i++) {
+      await ObjekPajak.update(
+        {
+          kodeBupot: "0",
+        },
+        {
+          where: {
+            kodeObjekPajak: req.body[i].kdObjPjk,
+          },
+        }
+      );
+      console.log(i);
+    }
+
+    // Status 201 = Created
+    // await transaction.commit();
+    res.status(200).json("Objek Pajak data updated!");
+  } catch (error) {
+    console.log(error);
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
 module.exports = {
   migrasiKlu,
   migrasiJenisPajak,
   migrasiJenisSetoran,
   migrasiTahun,
   migrasiObjekPajak,
+  updateTarifPersenObjekPajak,
+  updateKodeBupotObjekPajak,
 };

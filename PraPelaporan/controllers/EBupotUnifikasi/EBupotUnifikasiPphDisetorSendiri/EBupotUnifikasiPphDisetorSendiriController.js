@@ -2,7 +2,9 @@ const { Sequelize } = require("sequelize");
 const { sequelize } = require("../../../../config/Database.js");
 const Op = sequelize.Sequelize.Op;
 const EBupotUnifikasiPphDisetorSendiri = require("../../../models/EBupotUnifikasi/EBupotUnifikasiPphDisetorSendiri/EBupotUnifikasiPphDisetorSendiriModel.js");
+const User = require("../../../../User/models/UserModel.js");
 const EBilling = require("../../../../EBilling/models/EBilling/EBillingModel.js");
+const Tahun = require("../../../../Master/models/Tahun/TahunModel.js");
 const ObjekPajak = require("../../../../Master/models/ObjekPajak/ObjekPajakModel.js");
 const Cabang = require("../../../../Master/models/Cabang/CabangModel.js");
 const JenisSetoran = require("../../../../Master/models/JenisSetoran/JenisSetoranModel.js");
@@ -14,6 +16,7 @@ const getEBupotUnifikasiPphDisetorSendiris = async (req, res) => {
     const eBupotUnifikasiPphDisetorSendiris =
       await EBupotUnifikasiPphDisetorSendiri.findAll({
         include: [
+          { model: User },
           { model: EBilling },
           { model: ObjekPajak },
           { model: Cabang },
@@ -41,6 +44,7 @@ const getEBupotUnifikasiPphDisetorSendirisPagination = async (req, res) => {
     ],
   };
   let tempInclude = [
+    { model: User },
     { model: EBilling },
     { model: ObjekPajak },
     { model: Cabang },
@@ -91,6 +95,7 @@ const getEBupotUnifikasiPphDisetorSendirisByUserPagination = async (
     ],
   };
   let tempInclude = [
+    { model: User },
     { model: EBilling },
     { model: ObjekPajak },
     { model: Cabang },
@@ -132,42 +137,30 @@ const getEBupotUnifikasiPphDisetorSendirisByUserSearchPagination = async (
   const offset = limit * page;
 
   let tempWhere = {
-    userIdInput: req.body.userIdInput,
+    userEBupotUnifikasiPphDisetorSendiriId:
+      req.body.userEBupotUnifikasiPphDisetorSendiriId,
   };
   let tempInclude = [
-    { model: EBilling },
+    { model: User },
+    {
+      model: EBilling,
+      as: "ebilling",
+      include: [{ model: Tahun, as: "tahun" }],
+    },
     { model: ObjekPajak },
     { model: Cabang },
   ];
 
   if (req.body.pencairanBerdasarkan === "Periode") {
-    let input = req.body.masaTahunPajakSearch; // Input in month-year format
-
-    // Split the string into month and year
-    let [month, year] = input.split("-");
-
-    // Convert the month and year into integers
-    month = parseInt(month); // October (10th month)
-    year = parseInt(year); // 2024
-
-    // First date of the month (month is zero-indexed in JavaScript, so subtract 1)
-    let firstDate = new Date(year, month - 1, 1);
-
-    // Last date of the month
-    let lastDate = new Date(year, month, 0); // Setting day to 0 gives the last day of the previous month
-
+    let [bulan, tahun] = req.body.masaTahunPajakSearch.split("-");
     tempWhere = {
       [Op.and]: [
-        tempWhere, // Include the existing conditions (userIdInput and Op.or)
+        tempWhere,
         {
-          tanggalBuktiSetor: {
-            [Op.gte]: firstDate, // Greater than or equal to firstDate
-          },
+          "$ebilling.masaPajakDariBulan$": bulan,
         },
         {
-          tanggalBuktiSetor: {
-            [Op.lte]: lastDate, // Less than or equal to lastDate
-          },
+          "$ebilling.tahun.tahun$": tahun,
         },
       ],
     };
@@ -209,6 +202,7 @@ const getEBupotUnifikasiPphDisetorSendiriById = async (req, res) => {
           id: req.params.id,
         },
         include: [
+          { model: User },
           {
             model: EBilling,
             include: [
@@ -269,6 +263,7 @@ const saveEBupotUnifikasiPphDisetorSendiri = async (req, res) => {
       await EBupotUnifikasiPphDisetorSendiri.create(
         {
           ...req.body,
+          userEBupotUnifikasiPphDisetorSendiriId: req.body.userId,
           nomorBuktiSetor: nextNomorBuktiSetor,
           tanggalBuktiSetor,
           objekPajakId: findObjekPajak.id,
@@ -364,6 +359,7 @@ const deleteEBupotUnifikasiPphDisetorSendiri = async (req, res) => {
           id: req.params.id,
         },
         include: [
+          { model: User },
           { model: EBilling },
           { model: ObjekPajak },
           { model: Cabang },

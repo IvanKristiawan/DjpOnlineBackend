@@ -1,5 +1,6 @@
 const { Sequelize } = require("sequelize");
 const { sequelize } = require("../../../../config/Database.js");
+const User = require("../../../../User/models/UserModel.js");
 const EBilling = require("../../../../EBilling/models/EBilling/EBillingModel.js");
 const ObjekPajak = require("../../../../Master/models/ObjekPajak/ObjekPajakModel.js");
 const Cabang = require("../../../../Master/models/Cabang/CabangModel.js");
@@ -9,6 +10,11 @@ const { DataTypes } = Sequelize;
 const EBupotUnifikasiPphDisetorSendiri = sequelize.define(
   "ebupotunifikasipphdisetorsendiris",
   {
+    // Foreign Key User E-BupotUnifikasiPphDisetorSendiri
+    userEBupotUnifikasiPphDisetorSendiriId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     nomorBuktiSetor: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -59,6 +65,11 @@ const EBupotUnifikasiPphDisetorSendiri = sequelize.define(
     freezeTableName: true,
   }
 );
+
+EBupotUnifikasiPphDisetorSendiri.belongsTo(User, {
+  foreignKey: "userEBupotUnifikasiPphDisetorSendiriId",
+  targetKey: "id",
+});
 
 EBupotUnifikasiPphDisetorSendiri.belongsTo(EBilling, {
   foreignKey: "eBillingId",

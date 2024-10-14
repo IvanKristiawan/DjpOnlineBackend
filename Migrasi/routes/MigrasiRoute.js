@@ -5,6 +5,8 @@ const migrasiJenisPajak = controller.migrasiJenisPajak;
 const migrasiJenisSetoran = controller.migrasiJenisSetoran;
 const migrasiTahun = controller.migrasiTahun;
 const migrasiObjekPajak = controller.migrasiObjekPajak;
+const updateTarifPersenObjekPajak = controller.updateTarifPersenObjekPajak;
+const updateKodeBupotObjekPajak = controller.updateKodeBupotObjekPajak;
 
 const router = express.Router();
 
@@ -13,5 +15,7 @@ const router = express.Router();
 // router.post("/migrasiJenisSetoran", migrasiJenisSetoran);
 // router.post("/migrasiTahun", migrasiTahun);
 // router.post("/migrasiObjekPajak", migrasiObjekPajak);
+// router.post("/updateTarifPersenObjekPajak", updateTarifPersenObjekPajak);
+// router.post("/updateKodeBupotObjekPajak", updateKodeBupotObjekPajak);
 
 module.exports = router;

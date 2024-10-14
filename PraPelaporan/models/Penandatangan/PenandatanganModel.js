@@ -1,41 +1,37 @@
 const { Sequelize } = require("sequelize");
 const { sequelize } = require("../../../config/Database.js");
-const JenisSetoran = require("../JenisSetoran/JenisSetoranModel.js");
-const Cabang = require("../Cabang/CabangModel.js");
+const User = require("../../../User/models/UserModel.js");
+const Cabang = require("../../../Master/models/Cabang/CabangModel.js");
 
 const { DataTypes } = Sequelize;
 
-const ObjekPajak = sequelize.define(
-  "objekpajaks",
+const Penandatangan = sequelize.define(
+  "penandatangans",
   {
-    kodeObjekPajak: {
-      type: DataTypes.STRING,
-      default: "",
-      allowNull: false,
-      unique: true,
-    },
-    namaObjekPajak: {
-      type: DataTypes.STRING,
-      default: "",
-      allowNull: false,
-    },
-    ketObjekPajak: {
-      type: DataTypes.STRING,
-      default: "",
-      allowNull: true,
-    },
-    tarifPersen: {
-      type: DataTypes.DOUBLE,
-      allowNull: false,
-    },
-    kodeBupot: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-
-    // Foreign Key Jenis Setoran
-    jenisSetoranId: {
+    // Foreign Key User Penandatangan
+    userPenandatanganId: {
       type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    bertindakSebagai: {
+      type: DataTypes.STRING, // Wakil Wajib Pajak (Pengurus), Kuasa
+      allowNull: false,
+    },
+    jenisIdentitas: {
+      type: DataTypes.STRING, // NPWP, NIK
+      allowNull: false,
+    },
+    nomorIdentitas: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    namaIdentitas: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    status: {
+      type: DataTypes.BOOLEAN, // 0 Tidak Aktif, 1 Aktif
+      defaultValue: false,
       allowNull: false,
     },
 
@@ -59,17 +55,17 @@ const ObjekPajak = sequelize.define(
   }
 );
 
-ObjekPajak.belongsTo(JenisSetoran, {
-  foreignKey: "jenisSetoranId",
+Penandatangan.belongsTo(User, {
+  foreignKey: "userPenandatanganId",
   targetKey: "id",
 });
 
-ObjekPajak.belongsTo(Cabang, {
+Penandatangan.belongsTo(Cabang, {
   foreignKey: "cabangId",
   targetKey: "id",
 });
 
-module.exports = ObjekPajak;
+module.exports = Penandatangan;
 
 (async () => {
   await sequelize.sync();

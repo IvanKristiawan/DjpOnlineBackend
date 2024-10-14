@@ -148,6 +148,31 @@ addMonths = (date, months) => {
   return tempDate;
 };
 
+let masaPajakList = [
+  "Januari",
+  "Februari",
+  "Maret",
+  "April",
+  "Mei",
+  "Juni",
+  "Juli",
+  "Agustus",
+  "September",
+  "Oktober",
+  "November",
+  "Desember",
+];
+
+getMonthIndex = (month) => {
+  let index = masaPajakList.indexOf(month);
+  if (index !== -1) {
+    // Add 1 to the index and pad the result to 2 digits
+    return String(index + 1).padStart(2, "0");
+  } else {
+    return "Month not found";
+  }
+};
+
 module.exports = {
   findNextKode,
   findNextKodeJenisCOA,
@@ -158,4 +183,5 @@ module.exports = {
   findRomanDate,
   customRound,
   addMonths,
+  getMonthIndex,
 };
