@@ -10,6 +10,7 @@ const JenisPajak = require("../../Master/models/JenisPajak/JenisPajakModel.js");
 const Cabang = require("../../Master/models/Cabang/CabangModel.js");
 const JenisSetoran = require("../../Master/models/JenisSetoran/JenisSetoranModel.js");
 const ObjekPajak = require("../../Master/models/ObjekPajak/ObjekPajakModel.js");
+const Negara = require("../../Master/models/Negara/NegaraModel.js");
 const Tahun = require("../../Master/models/Tahun/TahunModel.js");
 const { findNextKode } = require("../../helper/helper.js");
 
@@ -439,6 +440,42 @@ const updateKodeBupotObjekPajak = async (req, res) => {
   }
 };
 
+const migrasiNegara = async (req, res) => {
+  Object.keys(req.body).forEach(function (k) {
+    if (typeof req.body[k] == "string") {
+      req.body[k] = req.body[k].toUpperCase().trim();
+    }
+  });
+  let transaction;
+
+  try {
+    transaction = await sequelize.transaction();
+
+    for (let i = 0; i < req.body.length; i++) {
+      // Save Negara
+      let dataNegara = {
+        kodeNegara: req.body[i].kodeNegara,
+        namaNegara: req.body[i].namaNegara,
+        ketNegara: "",
+        userIdInput: 1,
+        cabangId: "001",
+      };
+      insertedNegara = await Negara.create(dataNegara);
+    }
+
+    // Status 201 = Created
+    // await transaction.commit();
+    res.status(200).json("Negara data updated!");
+  } catch (error) {
+    console.log(error);
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
 module.exports = {
   migrasiKlu,
   migrasiJenisPajak,
@@ -447,4 +484,5 @@ module.exports = {
   migrasiObjekPajak,
   updateTarifPersenObjekPajak,
   updateKodeBupotObjekPajak,
+  migrasiNegara,
 };
