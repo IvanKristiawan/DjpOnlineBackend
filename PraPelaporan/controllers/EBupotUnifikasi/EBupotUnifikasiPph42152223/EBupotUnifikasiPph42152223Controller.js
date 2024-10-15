@@ -4,6 +4,8 @@ const Op = sequelize.Sequelize.Op;
 const EBupotUnifikasiPph42152223 = require("../../../models/EBupotUnifikasi/EBupotUnifikasiPph42152223/EBupotUnifikasiPph42152223Model.js");
 const User = require("../../../../User/models/UserModel.js");
 const ObjekPajak = require("../../../../Master/models/ObjekPajak/ObjekPajakModel.js");
+const JenisSetoran = require("../../../../Master/models/JenisSetoran/JenisSetoranModel.js");
+const JenisPajak = require("../../../../Master/models/JenisPajak/JenisPajakModel.js");
 const Penandatangan = require("../../../models/Penandatangan/PenandatanganModel.js");
 const DokumenDasarPemotonganEBupotUnifikasiPph42152223 = require("../../../models/EBupotUnifikasi/DokumenDasarPemotonganEBupotUnifikasiPph42152223/DokumenDasarPemotonganEBupotUnifikasiPph42152223Model.js");
 const Cabang = require("../../../../Master/models/Cabang/CabangModel.js");
@@ -21,6 +23,64 @@ const getEBupotUnifikasiPph42152223s = async (req, res) => {
         ],
       });
     res.status(200).json(eBupotUnifikasiPph42152223s);
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getEBupotUnifikasiPph42152223sByUserForExcel = async (req, res) => {
+  try {
+    const eBupotUnifikasiPph42152223s =
+      await EBupotUnifikasiPph42152223.findAll({
+        where: {
+          userEBupotUnifikasiPph42152223Id:
+            req.body.userEBupotUnifikasiPph42152223Id,
+        },
+        include: [
+          { model: User },
+          { model: Penandatangan },
+          {
+            model: ObjekPajak,
+            include: [
+              { model: JenisSetoran, include: [{ model: JenisPajak }] },
+            ],
+          },
+          { model: Cabang },
+        ],
+      });
+
+    let filteredEBupotUnifikasiPph42152223s = [];
+
+    for (let eBupotUnifikasiPph42152223 of eBupotUnifikasiPph42152223s) {
+      let objectData = {
+        NO_BUKTI_POTONG: eBupotUnifikasiPph42152223.nomorBuktiSetor,
+        TANGGAL_BUKTI_POTONG: eBupotUnifikasiPph42152223.tanggalBuktiSetor,
+        NPWP_PEMOTONG: eBupotUnifikasiPph42152223.user.npwp15,
+        NAMA_PEMOTONG: eBupotUnifikasiPph42152223.user.nama,
+        IDENTITAS_PENERIMA_PENGHASILAN:
+          eBupotUnifikasiPph42152223.identitas === "NPWP/NITKU"
+            ? eBupotUnifikasiPph42152223.npwpNitku
+            : eBupotUnifikasiPph42152223.nik,
+        NAMA_PENERIMA_PENGHASILAN: eBupotUnifikasiPph42152223.nama,
+        PENGHASILAN_BRUTO: eBupotUnifikasiPph42152223.jumlahPenghasilanBruto,
+        PPH_DIPOTONG: eBupotUnifikasiPph42152223.pPhYangDipotongDipungut,
+        KODE_OBJEK_PAJAK: eBupotUnifikasiPph42152223.objekpajak.kodeObjekPajak,
+
+        PASAL:
+          eBupotUnifikasiPph42152223.objekpajak.jenissetoran.jenispajak
+            .namaJenisPajak,
+
+        MASA_PAJAK: eBupotUnifikasiPph42152223.bulanPajak,
+        TAHUN_PAJAK: eBupotUnifikasiPph42152223.tahunPajak,
+        STATUS: eBupotUnifikasiPph42152223.isHapus ? "Dihapus" : "Normal",
+        REV_NO: 0,
+        POSTING: eBupotUnifikasiPph42152223.isPost ? "Sudah" : "Belum",
+      };
+      filteredEBupotUnifikasiPph42152223s.push(objectData);
+    }
+
+    res.status(200).json(filteredEBupotUnifikasiPph42152223s);
   } catch (error) {
     // Error 500 = Kesalahan di server
     res.status(500).json({ message: error.message });
@@ -466,6 +526,7 @@ const deleteEBupotUnifikasiPph42152223 = async (req, res) => {
 
 module.exports = {
   getEBupotUnifikasiPph42152223s,
+  getEBupotUnifikasiPph42152223sByUserForExcel,
   getEBupotUnifikasiPph42152223sPagination,
   getEBupotUnifikasiPph42152223sByUserPagination,
   getEBupotUnifikasiPph42152223sByUserSearchPagination,

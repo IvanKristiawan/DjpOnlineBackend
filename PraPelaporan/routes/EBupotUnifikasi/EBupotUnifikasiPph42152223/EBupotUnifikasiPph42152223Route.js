@@ -3,6 +3,8 @@ const controller = require("../../../controllers/EBupotUnifikasi/EBupotUnifikasi
 const verify = require("../../../../utils/verifyToken.js");
 const getEBupotUnifikasiPph42152223s =
   controller.getEBupotUnifikasiPph42152223s;
+const getEBupotUnifikasiPph42152223sByUserForExcel =
+  controller.getEBupotUnifikasiPph42152223sByUserForExcel;
 const getEBupotUnifikasiPph42152223sPagination =
   controller.getEBupotUnifikasiPph42152223sPagination;
 const getEBupotUnifikasiPph42152223sByUserPagination =
@@ -27,6 +29,11 @@ router.post(
   "/eBupotUnifikasiPph42152223s",
   verifyUser,
   getEBupotUnifikasiPph42152223s
+);
+router.post(
+  "/eBupotUnifikasiPph42152223sByUserForExcel",
+  verifyUser,
+  getEBupotUnifikasiPph42152223sByUserForExcel
 );
 router.post(
   "/eBupotUnifikasiPph42152223sPagination",
