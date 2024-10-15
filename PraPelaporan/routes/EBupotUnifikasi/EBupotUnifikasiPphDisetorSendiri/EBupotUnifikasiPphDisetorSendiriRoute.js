@@ -15,6 +15,8 @@ const saveEBupotUnifikasiPphDisetorSendiri =
   controller.saveEBupotUnifikasiPphDisetorSendiri;
 const updateEBupotUnifikasiPphDisetorSendiri =
   controller.updateEBupotUnifikasiPphDisetorSendiri;
+const statusDeleteEBupotUnifikasiPphDisetorSendiri =
+  controller.statusDeleteEBupotUnifikasiPphDisetorSendiri;
 const deleteEBupotUnifikasiPphDisetorSendiri =
   controller.deleteEBupotUnifikasiPphDisetorSendiri;
 const verifyUser = verify.verifyUser;
@@ -55,6 +57,11 @@ router.post(
   "/updateEBupotUnifikasiPphDisetorSendiri/:id",
   verifyUser,
   updateEBupotUnifikasiPphDisetorSendiri
+);
+router.post(
+  "/statusDeleteEBupotUnifikasiPphDisetorSendiri/:id",
+  verifyUser,
+  statusDeleteEBupotUnifikasiPphDisetorSendiri
 );
 router.post(
   "/deleteEBupotUnifikasiPphDisetorSendiri/:id",

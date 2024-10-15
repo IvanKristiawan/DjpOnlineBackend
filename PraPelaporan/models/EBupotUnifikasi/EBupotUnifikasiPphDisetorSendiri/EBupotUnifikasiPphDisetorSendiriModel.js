@@ -46,6 +46,20 @@ const EBupotUnifikasiPphDisetorSendiri = sequelize.define(
       allowNull: false,
     },
 
+    // isPost
+    isPost: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+
+    // isHapus
+    isHapus: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+
     userIdInput: {
       type: DataTypes.INTEGER,
       allowNull: true,

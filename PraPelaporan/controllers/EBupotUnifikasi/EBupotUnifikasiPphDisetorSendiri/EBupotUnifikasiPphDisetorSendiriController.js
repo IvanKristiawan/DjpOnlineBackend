@@ -348,6 +348,51 @@ const updateEBupotUnifikasiPphDisetorSendiri = async (req, res) => {
   }
 };
 
+const statusDeleteEBupotUnifikasiPphDisetorSendiri = async (req, res) => {
+  Object.keys(req.body).forEach(function (k) {
+    if (typeof req.body[k] == "string") {
+      req.body[k] = req.body[k].toUpperCase().trim();
+    }
+  });
+  let transaction;
+  try {
+    transaction = await sequelize.transaction();
+
+    await EBupotUnifikasiPphDisetorSendiri.update(
+      {
+        isHapus: true,
+      },
+      {
+        where: {
+          id: req.params.id,
+        },
+        transaction,
+      }
+    ).then(async (num) => {
+      // num come from numbers of updated data
+      if (num == 1) {
+        await transaction.commit();
+        res
+          .status(200)
+          .json({ message: "E-Bupot Unifikasi Pph Disetor Updated!" });
+      } else {
+        if (transaction) {
+          await transaction.rollback();
+        }
+        res.status(400).json({
+          message: `E-Bupot Unifikasi Pph Disetor ${req.params.id} not found!`,
+        });
+      }
+    });
+  } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
 const deleteEBupotUnifikasiPphDisetorSendiri = async (req, res) => {
   let transaction;
   try {
@@ -405,5 +450,6 @@ module.exports = {
   getEBupotUnifikasiPphDisetorSendiriById,
   saveEBupotUnifikasiPphDisetorSendiri,
   updateEBupotUnifikasiPphDisetorSendiri,
+  statusDeleteEBupotUnifikasiPphDisetorSendiri,
   deleteEBupotUnifikasiPphDisetorSendiri,
 };
