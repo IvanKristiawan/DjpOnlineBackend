@@ -1,44 +1,47 @@
 const { Sequelize } = require("sequelize");
 const { sequelize } = require("../../../../config/Database.js");
 const Op = sequelize.Sequelize.Op;
-const EBupotUnifikasiPph42152223 = require("../../../models/EBupotUnifikasi/EBupotUnifikasiPph42152223/EBupotUnifikasiPph42152223Model.js");
+const EBupotUnifikasiPphNonResiden = require("../../../models/EBupotUnifikasi/EBupotUnifikasiPphNonResiden/EBupotUnifikasiPphNonResidenModel.js");
 const User = require("../../../../User/models/UserModel.js");
+const Negara = require("../../../../Master/models/Negara/NegaraModel.js");
 const ObjekPajak = require("../../../../Master/models/ObjekPajak/ObjekPajakModel.js");
 const JenisSetoran = require("../../../../Master/models/JenisSetoran/JenisSetoranModel.js");
 const JenisPajak = require("../../../../Master/models/JenisPajak/JenisPajakModel.js");
 const Penandatangan = require("../../../models/Penandatangan/PenandatanganModel.js");
-const DokumenDasarPemotonganEBupotUnifikasiPph42152223 = require("../../../models/EBupotUnifikasi/DokumenDasarPemotonganEBupotUnifikasiPph42152223/DokumenDasarPemotonganEBupotUnifikasiPph42152223Model.js");
+const DokumenDasarPemotonganEBupotUnifikasiPphNonResiden = require("../../../models/EBupotUnifikasi/DokumenDasarPemotonganEBupotUnifikasiPphNonResiden/DokumenDasarPemotonganEBupotUnifikasiPphNonResidenModel.js");
 const Cabang = require("../../../../Master/models/Cabang/CabangModel.js");
 const { findNextKode, formatDate } = require("../../../../helper/helper");
 
-const getEBupotUnifikasiPph42152223s = async (req, res) => {
+const getEBupotUnifikasiPphNonResidens = async (req, res) => {
   try {
-    const eBupotUnifikasiPph42152223s =
-      await EBupotUnifikasiPph42152223.findAll({
+    const eBupotUnifikasiPphNonResidens =
+      await EBupotUnifikasiPphNonResiden.findAll({
         include: [
           { model: User },
+          { model: Negara },
           { model: Penandatangan },
           { model: ObjekPajak },
           { model: Cabang },
         ],
       });
-    res.status(200).json(eBupotUnifikasiPph42152223s);
+    res.status(200).json(eBupotUnifikasiPphNonResidens);
   } catch (error) {
     // Error 500 = Kesalahan di server
     res.status(500).json({ message: error.message });
   }
 };
 
-const getEBupotUnifikasiPph42152223sByUserForExcel = async (req, res) => {
+const getEBupotUnifikasiPphNonResidensByUserForExcel = async (req, res) => {
   try {
-    const eBupotUnifikasiPph42152223s =
-      await EBupotUnifikasiPph42152223.findAll({
+    const eBupotUnifikasiPphNonResidens =
+      await EBupotUnifikasiPphNonResiden.findAll({
         where: {
-          userEBupotUnifikasiPph42152223Id:
-            req.body.userEBupotUnifikasiPph42152223Id,
+          userEBupotUnifikasiPphNonResidenId:
+            req.body.userEBupotUnifikasiPphNonResidenId,
         },
         include: [
           { model: User },
+          { model: Negara },
           { model: Penandatangan },
           {
             model: ObjekPajak,
@@ -50,46 +53,44 @@ const getEBupotUnifikasiPph42152223sByUserForExcel = async (req, res) => {
         ],
       });
 
-    let filteredEBupotUnifikasiPph42152223s = [];
+    let filteredEBupotUnifikasiPphNonResidens = [];
 
-    for (let eBupotUnifikasiPph42152223 of eBupotUnifikasiPph42152223s) {
+    for (let eBupotUnifikasiPphNonResiden of eBupotUnifikasiPphNonResidens) {
       let objectData = {
-        NO_BUKTI_POTONG: eBupotUnifikasiPph42152223.nomorBuktiSetor,
+        NO_BUKTI_POTONG: eBupotUnifikasiPphNonResiden.nomorBuktiSetor,
         TANGGAL_BUKTI_POTONG: formatDate(
-          eBupotUnifikasiPph42152223.tanggalBuktiSetor
+          eBupotUnifikasiPphNonResiden.tanggalBuktiSetor
         ),
-        NPWP_PEMOTONG: eBupotUnifikasiPph42152223.user.npwp15,
-        NAMA_PEMOTONG: eBupotUnifikasiPph42152223.user.nama,
-        IDENTITAS_PENERIMA_PENGHASILAN:
-          eBupotUnifikasiPph42152223.identitas === "NPWP/NITKU"
-            ? eBupotUnifikasiPph42152223.npwpNitku
-            : eBupotUnifikasiPph42152223.nik,
-        NAMA_PENERIMA_PENGHASILAN: eBupotUnifikasiPph42152223.nama,
-        PENGHASILAN_BRUTO: eBupotUnifikasiPph42152223.jumlahPenghasilanBruto,
-        PPH_DIPOTONG: eBupotUnifikasiPph42152223.pPhYangDipotongDipungut,
-        KODE_OBJEK_PAJAK: eBupotUnifikasiPph42152223.objekpajak.kodeObjekPajak,
+        NPWP_PEMOTONG: eBupotUnifikasiPphNonResiden.user.npwp15,
+        NAMA_PEMOTONG: eBupotUnifikasiPphNonResiden.user.nama,
+        IDENTITAS_PENERIMA_PENGHASILAN: eBupotUnifikasiPphNonResiden.tin,
+        NAMA_PENERIMA_PENGHASILAN: eBupotUnifikasiPphNonResiden.nama,
+        PENGHASILAN_BRUTO: eBupotUnifikasiPphNonResiden.jumlahPenghasilanBruto,
+        PPH_DIPOTONG: eBupotUnifikasiPphNonResiden.pPhYangDipotongDipungut,
+        KODE_OBJEK_PAJAK:
+          eBupotUnifikasiPphNonResiden.objekpajak.kodeObjekPajak,
 
         PASAL:
-          eBupotUnifikasiPph42152223.objekpajak.jenissetoran.jenispajak
+          eBupotUnifikasiPphNonResiden.objekpajak.jenissetoran.jenispajak
             .namaJenisPajak,
 
-        MASA_PAJAK: eBupotUnifikasiPph42152223.bulanPajak,
-        TAHUN_PAJAK: eBupotUnifikasiPph42152223.tahunPajak,
-        STATUS: eBupotUnifikasiPph42152223.isHapus ? "Dihapus" : "Normal",
+        MASA_PAJAK: eBupotUnifikasiPphNonResiden.bulanPajak,
+        TAHUN_PAJAK: eBupotUnifikasiPphNonResiden.tahunPajak,
+        STATUS: eBupotUnifikasiPphNonResiden.isHapus ? "Dihapus" : "Normal",
         REV_NO: 0,
-        POSTING: eBupotUnifikasiPph42152223.isPost ? "Sudah" : "Belum",
+        POSTING: eBupotUnifikasiPphNonResiden.isPost ? "Sudah" : "Belum",
       };
-      filteredEBupotUnifikasiPph42152223s.push(objectData);
+      filteredEBupotUnifikasiPphNonResidens.push(objectData);
     }
 
-    res.status(200).json(filteredEBupotUnifikasiPph42152223s);
+    res.status(200).json(filteredEBupotUnifikasiPphNonResidens);
   } catch (error) {
     // Error 500 = Kesalahan di server
     res.status(500).json({ message: error.message });
   }
 };
 
-const getEBupotUnifikasiPph42152223sPagination = async (req, res) => {
+const getEBupotUnifikasiPphNonResidensPagination = async (req, res) => {
   const page = parseInt(req.query.page) || 0;
   const limit = parseInt(req.query.limit) || 10;
   const search = req.query.search_query || "";
@@ -97,7 +98,7 @@ const getEBupotUnifikasiPph42152223sPagination = async (req, res) => {
   let tempWhere = {
     [Op.or]: [
       {
-        npwpNitku: {
+        nama: {
           [Op.like]: "%" + search + "%",
         },
       },
@@ -105,26 +106,27 @@ const getEBupotUnifikasiPph42152223sPagination = async (req, res) => {
   };
   let tempInclude = [
     { model: User },
+    { model: Negara },
     { model: Penandatangan },
     { model: ObjekPajak },
     { model: Cabang },
   ];
 
-  const totalRows = await EBupotUnifikasiPph42152223.count({
+  const totalRows = await EBupotUnifikasiPphNonResiden.count({
     where: tempWhere,
     include: tempInclude,
   });
   const totalPage = Math.ceil(totalRows / limit);
   try {
-    const eBupotUnifikasiPph42152223s =
-      await EBupotUnifikasiPph42152223.findAll({
+    const eBupotUnifikasiPphNonResidens =
+      await EBupotUnifikasiPphNonResiden.findAll({
         where: tempWhere,
         include: tempInclude,
         offset: offset,
         limit: limit,
       });
     res.status(200).json({
-      eBupotUnifikasiPph42152223s,
+      eBupotUnifikasiPphNonResidens,
       page: page,
       limit: limit,
       totalRows: totalRows,
@@ -136,7 +138,7 @@ const getEBupotUnifikasiPph42152223sPagination = async (req, res) => {
   }
 };
 
-const getEBupotUnifikasiPph42152223sByUserPagination = async (req, res) => {
+const getEBupotUnifikasiPphNonResidensByUserPagination = async (req, res) => {
   const page = parseInt(req.query.page) || 0;
   const limit = parseInt(req.query.limit) || 10;
   const search = req.query.search_query || "";
@@ -145,7 +147,7 @@ const getEBupotUnifikasiPph42152223sByUserPagination = async (req, res) => {
     userIdInput: req.body.userIdInput,
     [Op.or]: [
       {
-        npwpNitku: {
+        nama: {
           [Op.like]: "%" + search + "%",
         },
       },
@@ -153,26 +155,27 @@ const getEBupotUnifikasiPph42152223sByUserPagination = async (req, res) => {
   };
   let tempInclude = [
     { model: User },
+    { model: Negara },
     { model: Penandatangan },
     { model: ObjekPajak },
     { model: Cabang },
   ];
 
-  const totalRows = await EBupotUnifikasiPph42152223.count({
+  const totalRows = await EBupotUnifikasiPphNonResiden.count({
     where: tempWhere,
     include: tempInclude,
   });
   const totalPage = Math.ceil(totalRows / limit);
   try {
-    const eBupotUnifikasiPph42152223s =
-      await EBupotUnifikasiPph42152223.findAll({
+    const eBupotUnifikasiPphNonResidens =
+      await EBupotUnifikasiPphNonResiden.findAll({
         where: tempWhere,
         include: tempInclude,
         offset: offset,
         limit: limit,
       });
     res.status(200).json({
-      eBupotUnifikasiPph42152223s,
+      eBupotUnifikasiPphNonResidens,
       page: page,
       limit: limit,
       totalRows: totalRows,
@@ -184,7 +187,7 @@ const getEBupotUnifikasiPph42152223sByUserPagination = async (req, res) => {
   }
 };
 
-const getEBupotUnifikasiPph42152223sByUserSearchPagination = async (
+const getEBupotUnifikasiPphNonResidensByUserSearchPagination = async (
   req,
   res
 ) => {
@@ -194,10 +197,12 @@ const getEBupotUnifikasiPph42152223sByUserSearchPagination = async (
   const offset = limit * page;
 
   let tempWhere = {
-    userEBupotUnifikasiPph42152223Id: req.body.userEBupotUnifikasiPph42152223Id,
+    userEBupotUnifikasiPphNonResidenId:
+      req.body.userEBupotUnifikasiPphNonResidenId,
   };
   let tempInclude = [
     { model: User },
+    { model: Negara },
     { model: Penandatangan },
     { model: ObjekPajak },
     { model: Cabang },
@@ -220,34 +225,31 @@ const getEBupotUnifikasiPph42152223sByUserSearchPagination = async (
     tempWhere["nomorBuktiSetor"] = req.body.nomorBuktiSetor;
   } else if (req.body.pencairanBerdasarkan === "Identitas") {
     tempWhere = {
-      userEBupotUnifikasiPph42152223Id:
-        req.body.userEBupotUnifikasiPph42152223Id,
+      userEBupotUnifikasiPphNonResidenId:
+        req.body.userEBupotUnifikasiPphNonResidenId,
       [Op.or]: [
         {
-          npwpNitku: req.body.identitas,
-        },
-        {
-          nik: req.body.identitas,
+          tin: req.body.identitas,
         },
       ],
     };
   }
 
-  const totalRows = await EBupotUnifikasiPph42152223.count({
+  const totalRows = await EBupotUnifikasiPphNonResiden.count({
     where: tempWhere,
     include: tempInclude,
   });
   const totalPage = Math.ceil(totalRows / limit);
   try {
-    const eBupotUnifikasiPph42152223s =
-      await EBupotUnifikasiPph42152223.findAll({
+    const eBupotUnifikasiPphNonResidens =
+      await EBupotUnifikasiPphNonResiden.findAll({
         where: tempWhere,
         include: tempInclude,
         offset: offset,
         limit: limit,
       });
     res.status(200).json({
-      eBupotUnifikasiPph42152223s,
+      eBupotUnifikasiPphNonResidens,
       page: page,
       limit: limit,
       totalRows: totalRows,
@@ -259,34 +261,37 @@ const getEBupotUnifikasiPph42152223sByUserSearchPagination = async (
   }
 };
 
-const getEBupotUnifikasiPph42152223ById = async (req, res) => {
+const getEBupotUnifikasiPphNonResidenById = async (req, res) => {
   try {
-    let eBupotUnifikasiPph42152223 = await EBupotUnifikasiPph42152223.findOne({
-      where: {
-        id: req.params.id,
-      },
-      include: [
-        { model: User },
-        { model: Penandatangan },
-        { model: ObjekPajak },
-        { model: Cabang },
-      ],
-    });
-
-    const dokumenDasarPemotonganEBupotUnifikasiPph42152223s =
-      await DokumenDasarPemotonganEBupotUnifikasiPph42152223.findAll({
+    let eBupotUnifikasiPphNonResiden =
+      await EBupotUnifikasiPphNonResiden.findOne({
         where: {
-          eBupotUnifikasiPph42152223Id: req.params.id,
+          id: req.params.id,
         },
         include: [
-          { model: EBupotUnifikasiPph42152223, include: [{ model: User }] },
+          { model: User },
+          { model: Negara },
+          { model: Penandatangan },
+          { model: ObjekPajak },
+          { model: Cabang },
+        ],
+      });
+
+    const dokumenDasarPemotonganEBupotUnifikasiPphNonResidens =
+      await DokumenDasarPemotonganEBupotUnifikasiPphNonResiden.findAll({
+        where: {
+          eBupotUnifikasiPphNonResidenId: req.params.id,
+        },
+        include: [
+          { model: EBupotUnifikasiPphNonResiden, include: [{ model: User }] },
           { model: Cabang },
         ],
       });
 
     let combinedResult = {
-      eBupotUnifikasiPph42152223: eBupotUnifikasiPph42152223,
-      dokumenDasarPemotongan: dokumenDasarPemotonganEBupotUnifikasiPph42152223s,
+      eBupotUnifikasiPphNonResiden: eBupotUnifikasiPphNonResiden,
+      dokumenDasarPemotongan:
+        dokumenDasarPemotonganEBupotUnifikasiPphNonResidens,
     };
 
     res.status(200).json(combinedResult);
@@ -296,14 +301,14 @@ const getEBupotUnifikasiPph42152223ById = async (req, res) => {
   }
 };
 
-const saveEBupotUnifikasiPph42152223 = async (req, res) => {
+const saveEBupotUnifikasiPphNonResiden = async (req, res) => {
   let transaction;
 
   try {
     transaction = await sequelize.transaction();
 
-    // 01.) Find Next EBupot Unifikasi Pph42152223
-    let maxNomorBuktiSetor = await EBupotUnifikasiPph42152223.max(
+    // 01.) Find Next EBupot Unifikasi PphNonResiden
+    let maxNomorBuktiSetor = await EBupotUnifikasiPphNonResiden.max(
       "nomorBuktiSetor",
       {
         where: {
@@ -321,14 +326,21 @@ const saveEBupotUnifikasiPph42152223 = async (req, res) => {
     // 02.) Find Tanggal Bukti Setor
     let tanggalBuktiSetor = new Date();
 
-    // 03.) Find Objek Pajak
+    // 03.) Find Negara
+    let findNegara = await Negara.findOne({
+      where: {
+        namaNegara: req.body.namaNegara,
+      },
+    });
+
+    // 04.) Find Objek Pajak
     let findObjekPajak = await ObjekPajak.findOne({
       where: {
         kodeObjekPajak: req.body.kodeObjekPajak,
       },
     });
 
-    // 04.) Find Penandatangan
+    // 05.) Find Penandatangan
     let findPenandatangan = await Penandatangan.findOne({
       where: {
         userPenandatanganId: req.body.userId,
@@ -336,16 +348,17 @@ const saveEBupotUnifikasiPph42152223 = async (req, res) => {
       },
     });
 
-    // 05.) Cari Bulan
+    // 06.) Cari Bulan
     let bulanPajak = getMonthIndex(req.body.masaPajak);
 
-    const insertedEBupotUnifikasiPph42152223 =
-      await EBupotUnifikasiPph42152223.create(
+    const insertedEBupotUnifikasiPphNonResiden =
+      await EBupotUnifikasiPphNonResiden.create(
         {
           ...req.body,
-          userEBupotUnifikasiPph42152223Id: req.body.userId,
+          userEBupotUnifikasiPphNonResidenId: req.body.userId,
           nomorBuktiSetor: nextNomorBuktiSetor,
           tanggalBuktiSetor,
+          negaraId: findNegara.id,
           objekPajakId: findObjekPajak.id,
           penandatanganId: findPenandatangan.id,
           bulanPajak,
@@ -355,11 +368,12 @@ const saveEBupotUnifikasiPph42152223 = async (req, res) => {
       );
 
     for (let dasarPemotongan of req.body.dasarPemotongan) {
-      const insertedDokumenDasarPemotonganEBupotUnifikasiPph42152223 =
-        await DokumenDasarPemotonganEBupotUnifikasiPph42152223.create(
+      const insertedDokumenDasarPemotonganEBupotUnifikasiPphNonResiden =
+        await DokumenDasarPemotonganEBupotUnifikasiPphNonResiden.create(
           {
             ...dasarPemotongan,
-            eBupotUnifikasiPph42152223Id: insertedEBupotUnifikasiPph42152223.id,
+            eBupotUnifikasiPphNonResidenId:
+              insertedEBupotUnifikasiPphNonResiden.id,
             cabangId: req.body.kodeCabang,
           },
           { transaction }
@@ -368,7 +382,7 @@ const saveEBupotUnifikasiPph42152223 = async (req, res) => {
 
     // Status 201 = Created
     await transaction.commit();
-    res.status(201).json(insertedEBupotUnifikasiPph42152223);
+    res.status(201).json(insertedEBupotUnifikasiPphNonResiden);
   } catch (error) {
     if (transaction) {
       await transaction.rollback();
@@ -378,7 +392,7 @@ const saveEBupotUnifikasiPph42152223 = async (req, res) => {
   }
 };
 
-const updateEBupotUnifikasiPph42152223 = async (req, res) => {
+const updateEBupotUnifikasiPphNonResiden = async (req, res) => {
   Object.keys(req.body).forEach(function (k) {
     if (typeof req.body[k] == "string") {
       req.body[k] = req.body[k].toUpperCase().trim();
@@ -388,14 +402,21 @@ const updateEBupotUnifikasiPph42152223 = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
 
-    // 01.) Find Objek Pajak
+    // 01.) Find Negara
+    let findNegara = await Negara.findOne({
+      where: {
+        namaNegara: req.body.namaNegara,
+      },
+    });
+
+    // 02.) Find Objek Pajak
     let findObjekPajak = await ObjekPajak.findOne({
       where: {
         kodeObjekPajak: req.body.kodeObjekPajak,
       },
     });
 
-    // 02.) Find Penandatangan
+    // 03.) Find Penandatangan
     let findPenandatangan = await Penandatangan.findOne({
       where: {
         userPenandatanganId: req.body.userId,
@@ -403,10 +424,11 @@ const updateEBupotUnifikasiPph42152223 = async (req, res) => {
       },
     });
 
-    let updatedEBupotUnifikasiPph42152223 =
-      await EBupotUnifikasiPph42152223.update(
+    let updatedEBupotUnifikasiPphNonResiden =
+      await EBupotUnifikasiPphNonResiden.update(
         {
           ...req.body,
+          negaraId: findNegara.id,
           objekPajakId: findObjekPajak.id,
           penandatanganId: findPenandatangan.id,
           cabangId: req.body.kodeCabang,
@@ -419,9 +441,9 @@ const updateEBupotUnifikasiPph42152223 = async (req, res) => {
         }
       );
 
-    await DokumenDasarPemotonganEBupotUnifikasiPph42152223.destroy({
+    await DokumenDasarPemotonganEBupotUnifikasiPphNonResiden.destroy({
       where: {
-        eBupotUnifikasiPph42152223Id: req.params.id,
+        eBupotUnifikasiPphNonResidenId: req.params.id,
       },
       transaction,
     });
@@ -431,11 +453,11 @@ const updateEBupotUnifikasiPph42152223 = async (req, res) => {
     );
 
     for (let dasarPemotongan of filteredDasarPemotongan) {
-      const insertedDokumenDasarPemotonganEBupotUnifikasiPph42152223 =
-        await DokumenDasarPemotonganEBupotUnifikasiPph42152223.create(
+      const insertedDokumenDasarPemotonganEBupotUnifikasiPphNonResiden =
+        await DokumenDasarPemotonganEBupotUnifikasiPphNonResiden.create(
           {
             ...dasarPemotongan,
-            eBupotUnifikasiPph42152223Id: req.params.id,
+            eBupotUnifikasiPphNonResidenId: req.params.id,
             cabangId: req.body.kodeCabang,
           },
           { transaction }
@@ -444,7 +466,7 @@ const updateEBupotUnifikasiPph42152223 = async (req, res) => {
 
     // Status 201 = Created
     await transaction.commit();
-    res.status(201).json(updatedEBupotUnifikasiPph42152223);
+    res.status(201).json(updatedEBupotUnifikasiPphNonResiden);
   } catch (error) {
     console.log(error);
     if (transaction) {
@@ -455,7 +477,7 @@ const updateEBupotUnifikasiPph42152223 = async (req, res) => {
   }
 };
 
-const statusDeleteEBupotUnifikasiPph42152223 = async (req, res) => {
+const statusDeleteEBupotUnifikasiPphNonResiden = async (req, res) => {
   Object.keys(req.body).forEach(function (k) {
     if (typeof req.body[k] == "string") {
       req.body[k] = req.body[k].toUpperCase().trim();
@@ -465,7 +487,7 @@ const statusDeleteEBupotUnifikasiPph42152223 = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
 
-    await EBupotUnifikasiPph42152223.update(
+    await EBupotUnifikasiPphNonResiden.update(
       {
         isHapus: true,
       },
@@ -481,13 +503,13 @@ const statusDeleteEBupotUnifikasiPph42152223 = async (req, res) => {
         await transaction.commit();
         res
           .status(200)
-          .json({ message: "E-Bupot Unifikasi Pph 42152223 Updated!" });
+          .json({ message: "E-Bupot Unifikasi Pph NonResiden Updated!" });
       } else {
         if (transaction) {
           await transaction.rollback();
         }
         res.status(400).json({
-          message: `E-Bupot Unifikasi Pph 42152223 ${req.params.id} not found!`,
+          message: `E-Bupot Unifikasi Pph NonResiden ${req.params.id} not found!`,
         });
       }
     });
@@ -500,12 +522,12 @@ const statusDeleteEBupotUnifikasiPph42152223 = async (req, res) => {
   }
 };
 
-const deleteEBupotUnifikasiPph42152223 = async (req, res) => {
+const deleteEBupotUnifikasiPphNonResiden = async (req, res) => {
   let transaction;
   try {
     transaction = await sequelize.transaction();
 
-    await EBupotUnifikasiPph42152223.destroy({
+    await EBupotUnifikasiPphNonResiden.destroy({
       where: {
         id: req.params.id,
       },
@@ -516,7 +538,7 @@ const deleteEBupotUnifikasiPph42152223 = async (req, res) => {
     await transaction.commit();
     res
       .status(201)
-      .json({ message: "E-Bupot Unifikasi Pph 42152223 Deleted!" });
+      .json({ message: "E-Bupot Unifikasi Pph NonResiden Deleted!" });
   } catch (error) {
     if (transaction) {
       await transaction.rollback();
@@ -527,14 +549,14 @@ const deleteEBupotUnifikasiPph42152223 = async (req, res) => {
 };
 
 module.exports = {
-  getEBupotUnifikasiPph42152223s,
-  getEBupotUnifikasiPph42152223sByUserForExcel,
-  getEBupotUnifikasiPph42152223sPagination,
-  getEBupotUnifikasiPph42152223sByUserPagination,
-  getEBupotUnifikasiPph42152223sByUserSearchPagination,
-  getEBupotUnifikasiPph42152223ById,
-  saveEBupotUnifikasiPph42152223,
-  updateEBupotUnifikasiPph42152223,
-  statusDeleteEBupotUnifikasiPph42152223,
-  deleteEBupotUnifikasiPph42152223,
+  getEBupotUnifikasiPphNonResidens,
+  getEBupotUnifikasiPphNonResidensByUserForExcel,
+  getEBupotUnifikasiPphNonResidensPagination,
+  getEBupotUnifikasiPphNonResidensByUserPagination,
+  getEBupotUnifikasiPphNonResidensByUserSearchPagination,
+  getEBupotUnifikasiPphNonResidenById,
+  saveEBupotUnifikasiPphNonResiden,
+  updateEBupotUnifikasiPphNonResiden,
+  statusDeleteEBupotUnifikasiPphNonResiden,
+  deleteEBupotUnifikasiPphNonResiden,
 };

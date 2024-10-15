@@ -1,32 +1,32 @@
 const { Sequelize } = require("sequelize");
 const { sequelize } = require("../../../../config/Database.js");
 const Op = sequelize.Sequelize.Op;
-const DokumenDasarPemotonganEBupotUnifikasiPph42152223 = require("../../../models/EBupotUnifikasi/DokumenDasarPemotonganEBupotUnifikasiPph42152223/DokumenDasarPemotonganEBupotUnifikasiPph42152223Model.js");
-const EBupotUnifikasiPph42152223 = require("../../../models/EBupotUnifikasi/EBupotUnifikasiPph42152223/EBupotUnifikasiPph42152223Model.js");
+const DokumenDasarPemotonganEBupotUnifikasiPphNonResiden = require("../../../models/EBupotUnifikasi/DokumenDasarPemotonganEBupotUnifikasiPphNonResiden/DokumenDasarPemotonganEBupotUnifikasiPphNonResidenModel.js");
+const EBupotUnifikasiPphNonResiden = require("../../../models/EBupotUnifikasi/EBupotUnifikasiPphNonResiden/EBupotUnifikasiPphNonResidenModel.js");
 const User = require("../../../../User/models/UserModel.js");
 const Cabang = require("../../../../Master/models/Cabang/CabangModel.js");
 const { findNextKode } = require("../../../../helper/helper");
 
-const getDokumenDasarPemotonganEBupotUnifikasiPph42152223s = async (
+const getDokumenDasarPemotonganEBupotUnifikasiPphNonResidens = async (
   req,
   res
 ) => {
   try {
-    const dokumenDasarPemotonganEBupotUnifikasiPph42152223s =
-      await DokumenDasarPemotonganEBupotUnifikasiPph42152223.findAll({
+    const dokumenDasarPemotonganEBupotUnifikasiPphNonResidens =
+      await DokumenDasarPemotonganEBupotUnifikasiPphNonResiden.findAll({
         include: [
-          { model: EBupotUnifikasiPph42152223, include: [{ model: User }] },
+          { model: EBupotUnifikasiPphNonResiden, include: [{ model: User }] },
           { model: Cabang },
         ],
       });
-    res.status(200).json(dokumenDasarPemotonganEBupotUnifikasiPph42152223s);
+    res.status(200).json(dokumenDasarPemotonganEBupotUnifikasiPphNonResidens);
   } catch (error) {
     // Error 500 = Kesalahan di server
     res.status(500).json({ message: error.message });
   }
 };
 
-const getDokumenDasarPemotonganEBupotUnifikasiPph42152223sPagination = async (
+const getDokumenDasarPemotonganEBupotUnifikasiPphNonResidensPagination = async (
   req,
   res
 ) => {
@@ -44,26 +44,26 @@ const getDokumenDasarPemotonganEBupotUnifikasiPph42152223sPagination = async (
     ],
   };
   let tempInclude = [
-    { model: EBupotUnifikasiPph42152223, include: [{ model: User }] },
+    { model: EBupotUnifikasiPphNonResiden, include: [{ model: User }] },
     { model: Cabang },
   ];
 
   const totalRows =
-    await DokumenDasarPemotonganEBupotUnifikasiPph42152223.count({
+    await DokumenDasarPemotonganEBupotUnifikasiPphNonResiden.count({
       where: tempWhere,
       include: tempInclude,
     });
   const totalPage = Math.ceil(totalRows / limit);
   try {
-    const dokumenDasarPemotonganEBupotUnifikasiPph42152223s =
-      await DokumenDasarPemotonganEBupotUnifikasiPph42152223.findAll({
+    const dokumenDasarPemotonganEBupotUnifikasiPphNonResidens =
+      await DokumenDasarPemotonganEBupotUnifikasiPphNonResiden.findAll({
         where: tempWhere,
         include: tempInclude,
         offset: offset,
         limit: limit,
       });
     res.status(200).json({
-      dokumenDasarPemotonganEBupotUnifikasiPph42152223s,
+      dokumenDasarPemotonganEBupotUnifikasiPphNonResidens,
       page: page,
       limit: limit,
       totalRows: totalRows,
@@ -75,29 +75,29 @@ const getDokumenDasarPemotonganEBupotUnifikasiPph42152223sPagination = async (
   }
 };
 
-const getDokumenDasarPemotonganEBupotUnifikasiPph42152223ById = async (
+const getDokumenDasarPemotonganEBupotUnifikasiPphNonResidenById = async (
   req,
   res
 ) => {
   try {
-    const dokumenDasarPemotonganEBupotUnifikasiPph42152223 =
-      await DokumenDasarPemotonganEBupotUnifikasiPph42152223.findOne({
+    const dokumenDasarPemotonganEBupotUnifikasiPphNonResiden =
+      await DokumenDasarPemotonganEBupotUnifikasiPphNonResiden.findOne({
         where: {
           id: req.params.id,
         },
         include: [
-          { model: EBupotUnifikasiPph42152223, include: [{ model: User }] },
+          { model: EBupotUnifikasiPphNonResiden, include: [{ model: User }] },
           { model: Cabang },
         ],
       });
-    res.status(200).json(dokumenDasarPemotonganEBupotUnifikasiPph42152223);
+    res.status(200).json(dokumenDasarPemotonganEBupotUnifikasiPphNonResiden);
   } catch (error) {
     // Error 404 = Not Found
     res.status(404).json({ message: error.message });
   }
 };
 
-const saveDokumenDasarPemotonganEBupotUnifikasiPph42152223 = async (
+const saveDokumenDasarPemotonganEBupotUnifikasiPphNonResiden = async (
   req,
   res
 ) => {
@@ -106,19 +106,19 @@ const saveDokumenDasarPemotonganEBupotUnifikasiPph42152223 = async (
   try {
     transaction = await sequelize.transaction();
 
-    // 01.) Find EBupotUnifikasiPph42152223
-    let findEBupotUnifikasiPph42152223 =
-      await EBupotUnifikasiPph42152223.findOne({
+    // 01.) Find EBupotUnifikasiPphNonResiden
+    let findEBupotUnifikasiPphNonResiden =
+      await EBupotUnifikasiPphNonResiden.findOne({
         where: {
-          id: req.body.EBupotUnifikasiPph42152223Id,
+          id: req.body.EBupotUnifikasiPphNonResidenId,
         },
       });
 
-    const insertedDokumenDasarPemotonganEBupotUnifikasiPph42152223 =
-      await DokumenDasarPemotonganEBupotUnifikasiPph42152223.create(
+    const insertedDokumenDasarPemotonganEBupotUnifikasiPphNonResiden =
+      await DokumenDasarPemotonganEBupotUnifikasiPphNonResiden.create(
         {
           ...req.body,
-          eBupotUnifikasiPph42152223Id: findEBupotUnifikasiPph42152223.id,
+          eBupotUnifikasiPphNonResidenId: findEBupotUnifikasiPphNonResiden.id,
           cabangId: req.body.kodeCabang,
         },
         { transaction }
@@ -128,7 +128,7 @@ const saveDokumenDasarPemotonganEBupotUnifikasiPph42152223 = async (
     await transaction.commit();
     res
       .status(201)
-      .json(insertedDokumenDasarPemotonganEBupotUnifikasiPph42152223);
+      .json(insertedDokumenDasarPemotonganEBupotUnifikasiPphNonResiden);
   } catch (error) {
     if (transaction) {
       await transaction.rollback();
@@ -138,7 +138,7 @@ const saveDokumenDasarPemotonganEBupotUnifikasiPph42152223 = async (
   }
 };
 
-const updateDokumenDasarPemotonganEBupotUnifikasiPph42152223 = async (
+const updateDokumenDasarPemotonganEBupotUnifikasiPphNonResiden = async (
   req,
   res
 ) => {
@@ -151,18 +151,18 @@ const updateDokumenDasarPemotonganEBupotUnifikasiPph42152223 = async (
   try {
     transaction = await sequelize.transaction();
 
-    // 01.) Find EBupotUnifikasiPph42152223
-    let findEBupotUnifikasiPph42152223 =
-      await EBupotUnifikasiPph42152223.findOne({
+    // 01.) Find EBupotUnifikasiPphNonResiden
+    let findEBupotUnifikasiPphNonResiden =
+      await EBupotUnifikasiPphNonResiden.findOne({
         where: {
-          id: req.body.EBupotUnifikasiPph42152223Id,
+          id: req.body.EBupotUnifikasiPphNonResidenId,
         },
       });
 
-    await DokumenDasarPemotonganEBupotUnifikasiPph42152223.update(
+    await DokumenDasarPemotonganEBupotUnifikasiPphNonResiden.update(
       {
         ...req.body,
-        eBupotUnifikasiPph42152223Id: findEBupotUnifikasiPph42152223.id,
+        eBupotUnifikasiPphNonResidenId: findEBupotUnifikasiPphNonResiden.id,
         cabangId: req.body.kodeCabang,
       },
       {
@@ -177,14 +177,14 @@ const updateDokumenDasarPemotonganEBupotUnifikasiPph42152223 = async (
         await transaction.commit();
         res.status(200).json({
           message:
-            "Dokumen Dasar Pemotongan E-Bupot Unifikasi Pph 42152223 Updated!",
+            "Dokumen Dasar Pemotongan E-Bupot Unifikasi Pph NonResiden Updated!",
         });
       } else {
         if (transaction) {
           await transaction.rollback();
         }
         res.status(400).json({
-          message: `Dokumen Dasar Pemotongan E-Bupot Unifikasi Pph 42152223 ${req.params.id} not found!`,
+          message: `Dokumen Dasar Pemotongan E-Bupot Unifikasi Pph NonResiden ${req.params.id} not found!`,
         });
       }
     });
@@ -197,7 +197,7 @@ const updateDokumenDasarPemotonganEBupotUnifikasiPph42152223 = async (
   }
 };
 
-const deleteDokumenDasarPemotonganEBupotUnifikasiPph42152223 = async (
+const deleteDokumenDasarPemotonganEBupotUnifikasiPphNonResiden = async (
   req,
   res
 ) => {
@@ -205,7 +205,7 @@ const deleteDokumenDasarPemotonganEBupotUnifikasiPph42152223 = async (
   try {
     transaction = await sequelize.transaction();
 
-    await DokumenDasarPemotonganEBupotUnifikasiPph42152223.destroy({
+    await DokumenDasarPemotonganEBupotUnifikasiPphNonResiden.destroy({
       where: {
         id: req.params.id,
       },
@@ -216,7 +216,7 @@ const deleteDokumenDasarPemotonganEBupotUnifikasiPph42152223 = async (
     await transaction.commit();
     res.status(201).json({
       message:
-        "Dokumen Dasar Pemotongan E-Bupot Unifikasi Pph 42152223 Deleted!",
+        "Dokumen Dasar Pemotongan E-Bupot Unifikasi Pph NonResiden Deleted!",
     });
   } catch (error) {
     if (transaction) {
@@ -228,10 +228,10 @@ const deleteDokumenDasarPemotonganEBupotUnifikasiPph42152223 = async (
 };
 
 module.exports = {
-  getDokumenDasarPemotonganEBupotUnifikasiPph42152223s,
-  getDokumenDasarPemotonganEBupotUnifikasiPph42152223sPagination,
-  getDokumenDasarPemotonganEBupotUnifikasiPph42152223ById,
-  saveDokumenDasarPemotonganEBupotUnifikasiPph42152223,
-  updateDokumenDasarPemotonganEBupotUnifikasiPph42152223,
-  deleteDokumenDasarPemotonganEBupotUnifikasiPph42152223,
+  getDokumenDasarPemotonganEBupotUnifikasiPphNonResidens,
+  getDokumenDasarPemotonganEBupotUnifikasiPphNonResidensPagination,
+  getDokumenDasarPemotonganEBupotUnifikasiPphNonResidenById,
+  saveDokumenDasarPemotonganEBupotUnifikasiPphNonResiden,
+  updateDokumenDasarPemotonganEBupotUnifikasiPphNonResiden,
+  deleteDokumenDasarPemotonganEBupotUnifikasiPphNonResiden,
 };

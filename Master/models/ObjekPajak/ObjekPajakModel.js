@@ -32,6 +32,14 @@ const ObjekPajak = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    pilihanPerkiraanPenghasilanNetto: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    perkiraanPenghasilanNetto: {
+      type: DataTypes.DOUBLE,
+      allowNull: false,
+    },
 
     // Foreign Key Jenis Setoran
     jenisSetoranId: {

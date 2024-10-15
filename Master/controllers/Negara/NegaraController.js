@@ -7,7 +7,7 @@ const Cabang = require("../../models/Cabang/CabangModel.js");
 const getNegaras = async (req, res) => {
   try {
     const negaras = await Negara.findAll({
-      order: [["kodeNegara", "ASC"]],
+      order: [["namaNegara", "ASC"]],
       include: [{ model: Cabang }],
     });
     res.status(200).json(negaras);
