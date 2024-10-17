@@ -479,13 +479,15 @@ const deleteEBupotUnifikasiBuktiSetor = async (req, res) => {
       ],
     });
 
-    await EBupotUnifikasiTagihanPemotongan.update(
-      { isSetor: false },
+    await EBupotUnifikasiTagihanPemotongan.decrement(
+      {
+        pphYangDisetor: eBupotUnifikasiBuktiSetor.pphYangDisetor,
+      },
       {
         where: {
           id: eBupotUnifikasiBuktiSetor.ebupotunifikasitagihanpemotongan.id,
         },
-        transaction,
+        transaction, // Ensure transaction is used
       }
     );
 
