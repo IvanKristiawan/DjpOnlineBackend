@@ -31,6 +31,8 @@ const DokumenDasarPemotonganEBupotUnifikasiPph42152223Route = require("./PraPela
 const EBupotUnifikasiPphNonResidenRoute = require("./PraPelaporan/routes/EBupotUnifikasi/EBupotUnifikasiPphNonResiden/EBupotUnifikasiPphNonResidenRoute.js");
 const DokumenDasarPemotonganEBupotUnifikasiPphNonResidenRoute = require("./PraPelaporan/routes/EBupotUnifikasi/DokumenDasarPemotonganEBupotUnifikasiPphNonResiden/DokumenDasarPemotonganEBupotUnifikasiPphNonResidenRoute.js");
 const EBupotUnifikasiPostingRoute = require("./PraPelaporan/routes/EBupotUnifikasi/EBupotUnifikasiPosting/EBupotUnifikasiPostingRoute.js");
+const EBupotUnifikasiTagihanPemotonganRoute = require("./PraPelaporan/routes/EBupotUnifikasi/EBupotUnifikasiTagihanPemotongan/EBupotUnifikasiTagihanPemotonganRoute.js");
+// Import Penandatangan
 const PenandatanganRoute = require("./PraPelaporan/routes/Penandatangan/PenandatanganRoute.js");
 // Import Setting
 const MigrasiRoute = require("./Migrasi/routes/MigrasiRoute.js");
@@ -67,6 +69,8 @@ app.use(DokumenDasarPemotonganEBupotUnifikasiPph42152223Route);
 app.use(EBupotUnifikasiPphNonResidenRoute);
 app.use(DokumenDasarPemotonganEBupotUnifikasiPphNonResidenRoute);
 app.use(EBupotUnifikasiPostingRoute);
+app.use(EBupotUnifikasiTagihanPemotonganRoute);
+// Penandatangan
 app.use(PenandatanganRoute);
 // Migrasi
 app.use(MigrasiRoute);

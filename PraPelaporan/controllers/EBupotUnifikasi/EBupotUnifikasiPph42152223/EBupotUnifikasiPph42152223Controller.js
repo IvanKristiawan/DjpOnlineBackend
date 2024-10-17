@@ -379,12 +379,8 @@ const saveEBupotUnifikasiPph42152223 = async (req, res) => {
 };
 
 const updateEBupotUnifikasiPph42152223 = async (req, res) => {
-  Object.keys(req.body).forEach(function (k) {
-    if (typeof req.body[k] == "string") {
-      req.body[k] = req.body[k].toUpperCase().trim();
-    }
-  });
   let transaction;
+
   try {
     transaction = await sequelize.transaction();
 

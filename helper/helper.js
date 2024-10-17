@@ -173,6 +173,19 @@ getMonthIndex = (month) => {
   }
 };
 
+generateIdBilling = () => {
+  // Generate a random number and convert it to a string
+  let randomNumber = Math.random().toString().slice(2); // Remove "0."
+
+  // If the generated string is less than 15 characters, repeat the process
+  while (randomNumber.length < 15) {
+    randomNumber += Math.random().toString().slice(2); // Append more random digits
+  }
+
+  // Return the first 15 digits
+  return randomNumber.slice(0, 15);
+};
+
 module.exports = {
   findNextKode,
   findNextKodeJenisCOA,
@@ -184,4 +197,5 @@ module.exports = {
   customRound,
   addMonths,
   getMonthIndex,
+  generateIdBilling,
 };
