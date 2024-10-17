@@ -11,6 +11,7 @@ const {
   findNextKode,
   formatDate,
   generateIdBilling,
+  generateRandomString,
 } = require("../../../../helper/helper");
 
 const getEBupotUnifikasiTagihanPemotongans = async (req, res) => {
@@ -237,6 +238,51 @@ const getEBupotUnifikasiTagihanPemotongansByUserSearchPagination = async (
   }
 };
 
+const getEBupotUnifikasiTagihanPemotonganByNtpnUser = async (req, res) => {
+  try {
+    let eBupotUnifikasiTagihanPemotongan =
+      await EBupotUnifikasiTagihanPemotongan.findOne({
+        where: {
+          ntpnBilling: req.body.ntpnBilling,
+          userIdInput: req.body.userIdInput,
+          // isSetor: false,
+          tahunPajak: req.body.tahunPajak,
+          [Op.and]: [
+            Sequelize.where(
+              Sequelize.col("pphYangDipotong"),
+              Op.ne,
+              Sequelize.col("pphYangDisetor")
+            ), // Ensure the two fields are not equal
+          ],
+        },
+        include: [
+          { model: User },
+          {
+            model: ObjekPajak,
+            include: [
+              {
+                model: JenisSetoran,
+                as: "jenissetoran",
+                include: [
+                  {
+                    model: JenisPajak,
+                    as: "jenispajak",
+                  },
+                ],
+              },
+            ],
+          },
+          { model: Cabang },
+        ],
+      });
+
+    res.status(200).json(eBupotUnifikasiTagihanPemotongan);
+  } catch (error) {
+    // Error 404 = Not Found
+    res.status(404).json({ message: error.message });
+  }
+};
+
 const getEBupotUnifikasiTagihanPemotonganById = async (req, res) => {
   try {
     let eBupotUnifikasiTagihanPemotongan =
@@ -331,17 +377,56 @@ const generateIdBillingEBupotUnifikasiTagihanPemotongan = async (req, res) => {
     // Find Next Month
     let masaAktifKodeBilling = addMonths(new Date(), 2);
 
+    const ntpnBilling = generateRandomString(16);
+
     let updatedEBupotUnifikasiTagihanPemotongan =
       await EBupotUnifikasiTagihanPemotongan.update(
         {
           idBilling,
           masaAktifKodeBilling,
+          ntpnBilling,
         },
         {
           where: {
             id: req.params.id,
           },
           transaction,
+        }
+      );
+
+    // Status 201 = Created
+    await transaction.commit();
+    res.status(201).json(updatedEBupotUnifikasiTagihanPemotongan);
+  } catch (error) {
+    console.log(error);
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const setorEBupotUnifikasiTagihanPemotongan = async (req, res) => {
+  Object.keys(req.body).forEach(function (k) {
+    if (typeof req.body[k] == "string") {
+      req.body[k] = req.body[k].toUpperCase().trim();
+    }
+  });
+  let transaction;
+  try {
+    transaction = await sequelize.transaction();
+
+    let updatedEBupotUnifikasiTagihanPemotongan =
+      await EBupotUnifikasiTagihanPemotongan.increment(
+        {
+          pphYangDisetor: req.body.pphYangDisetor,
+        },
+        {
+          where: {
+            id: req.params.id,
+          },
+          transaction, // Ensure transaction is used
         }
       );
 
@@ -434,9 +519,11 @@ module.exports = {
   getEBupotUnifikasiTagihanPemotongansPagination,
   getEBupotUnifikasiTagihanPemotongansByUserPagination,
   getEBupotUnifikasiTagihanPemotongansByUserSearchPagination,
+  getEBupotUnifikasiTagihanPemotonganByNtpnUser,
   getEBupotUnifikasiTagihanPemotonganById,
   saveEBupotUnifikasiTagihanPemotongan,
   generateIdBillingEBupotUnifikasiTagihanPemotongan,
+  setorEBupotUnifikasiTagihanPemotongan,
   updateEBupotUnifikasiTagihanPemotongan,
   deleteEBupotUnifikasiTagihanPemotongan,
 };

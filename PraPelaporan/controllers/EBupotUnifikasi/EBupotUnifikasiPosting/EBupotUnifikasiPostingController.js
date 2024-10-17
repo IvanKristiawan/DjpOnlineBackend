@@ -32,10 +32,33 @@ const eBupotUnifikasiPosting = async (req, res) => {
       tahunPajak: tahun,
     };
 
-    await EBupotUnifikasiTagihanPemotongan.destroy({
-      where: tempWhereTagihanPemotongan,
-      transaction, // Make sure to use the transaction
-    });
+    await EBupotUnifikasiTagihanPemotongan.update(
+      {
+        pphYangDipotong: 0,
+      },
+      {
+        where: tempWhereTagihanPemotongan,
+        transaction, // Ensure transaction is used
+      }
+    );
+
+    // Delete All Tagihan Pemotongan in Periode PphDisetorSendiri
+    let tempWhereTagihanPemotonganPphDisetorSendiri = {
+      masaPajak: bulan,
+      tahunPajak: tahun,
+      jenis: "PphDisetorSendiri",
+    };
+
+    await EBupotUnifikasiTagihanPemotongan.update(
+      {
+        pphYangDipotong: 0,
+        pphYangDisetor: 0,
+      },
+      {
+        where: tempWhereTagihanPemotonganPphDisetorSendiri,
+        transaction, // Ensure transaction is used
+      }
+    );
 
     // 01.) Posting EBupotUnifikasiPphDisetorSendiri
     let tempWhereEBupotUnifikasiPphDisetorSendiri = {
@@ -103,8 +126,9 @@ const eBupotUnifikasiPosting = async (req, res) => {
       if (!findEBupotUnifikasiTagihanPemotongan) {
         // Save Tagihan Pemotongan
         let dataTagihanPemotongan = {
+          jenis: "PphDisetorSendiri",
           tanggalTagihanPemotongan: new Date(),
-          userEBupotUnifikasiTagihanPemotonganId: req.body.userId,
+          userEBupotUnifikasiTagihanPemotonganId: req.body.userIdInput,
           nop: "",
           objekPajakId: eBupotUnifikasiPphDisetorSendiri.objekPajakId,
           masaPajak:
@@ -120,6 +144,7 @@ const eBupotUnifikasiPosting = async (req, res) => {
           namaPenyetor: eBupotUnifikasiPphDisetorSendiri.user.nama,
           idBilling: "",
           masaAktifKodeBilling: null,
+          userIdInput: req.body.userId,
           cabangId: req.body.kodeCabang,
         };
 
@@ -131,6 +156,8 @@ const eBupotUnifikasiPosting = async (req, res) => {
         await EBupotUnifikasiTagihanPemotongan.increment(
           {
             pphYangDipotong:
+              eBupotUnifikasiPphDisetorSendiri.ebilling.jumlahSetor,
+            pphYangDisetor:
               eBupotUnifikasiPphDisetorSendiri.ebilling.jumlahSetor,
           },
           {
@@ -200,6 +227,7 @@ const eBupotUnifikasiPosting = async (req, res) => {
       if (!findEBupotUnifikasiTagihanPemotongan) {
         // Save Tagihan Pemotongan
         let dataTagihanPemotongan = {
+          jenis: "Pph42152223",
           tanggalTagihanPemotongan: new Date(),
           userEBupotUnifikasiTagihanPemotonganId: req.body.userId,
           nop: "",
@@ -215,6 +243,7 @@ const eBupotUnifikasiPosting = async (req, res) => {
           namaPenyetor: eBupotUnifikasiPph42152223.user.nama,
           idBilling: "",
           masaAktifKodeBilling: null,
+          userIdInput: req.body.userId,
           cabangId: req.body.kodeCabang,
         };
 
@@ -295,6 +324,7 @@ const eBupotUnifikasiPosting = async (req, res) => {
       if (!findEBupotUnifikasiTagihanPemotongan) {
         // Save Tagihan Pemotongan
         let dataTagihanPemotongan = {
+          jenis: "PphNonResiden",
           tanggalTagihanPemotongan: new Date(),
           userEBupotUnifikasiTagihanPemotonganId: req.body.userId,
           nop: "",
@@ -310,6 +340,7 @@ const eBupotUnifikasiPosting = async (req, res) => {
           namaPenyetor: eBupotUnifikasiPphNonResiden.user.nama,
           idBilling: "",
           masaAktifKodeBilling: null,
+          userIdInput: req.body.userId,
           cabangId: req.body.kodeCabang,
         };
 

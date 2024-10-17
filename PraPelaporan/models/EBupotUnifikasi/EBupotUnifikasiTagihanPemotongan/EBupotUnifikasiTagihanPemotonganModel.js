@@ -9,6 +9,11 @@ const { DataTypes } = Sequelize;
 const EBupotUnifikasiTagihanPemotongan = sequelize.define(
   "ebupotunifikasitagihanpemotongans",
   {
+    jenis: {
+      type: DataTypes.STRING,
+      default: "",
+      allowNull: true,
+    },
     tanggalTagihanPemotongan: {
       type: DataTypes.DATE,
       default: new Date(),
@@ -83,6 +88,19 @@ const EBupotUnifikasiTagihanPemotongan = sequelize.define(
     masaAktifKodeBilling: {
       type: DataTypes.DATE,
       allowNull: true,
+    },
+
+    ntpnBilling: {
+      type: DataTypes.STRING,
+      default: "",
+      allowNull: true,
+    },
+
+    // Setor
+    isSetor: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
     },
 
     userIdInput: {

@@ -186,6 +186,18 @@ generateIdBilling = () => {
   return randomNumber.slice(0, 15);
 };
 
+generateRandomString = (length) => {
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // Uppercase letters and numbers
+  let result = "";
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length); // Pick a random index
+    result += characters[randomIndex]; // Append the character at that index
+  }
+
+  return result;
+};
+
 module.exports = {
   findNextKode,
   findNextKodeJenisCOA,
@@ -198,4 +210,5 @@ module.exports = {
   addMonths,
   getMonthIndex,
   generateIdBilling,
+  generateRandomString,
 };

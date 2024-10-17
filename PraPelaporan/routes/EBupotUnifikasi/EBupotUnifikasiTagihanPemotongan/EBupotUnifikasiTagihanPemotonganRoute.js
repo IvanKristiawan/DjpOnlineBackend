@@ -9,12 +9,16 @@ const getEBupotUnifikasiTagihanPemotongansByUserPagination =
   controller.getEBupotUnifikasiTagihanPemotongansByUserPagination;
 const getEBupotUnifikasiTagihanPemotongansByUserSearchPagination =
   controller.getEBupotUnifikasiTagihanPemotongansByUserSearchPagination;
+const getEBupotUnifikasiTagihanPemotonganByNtpnUser =
+  controller.getEBupotUnifikasiTagihanPemotonganByNtpnUser;
 const getEBupotUnifikasiTagihanPemotonganById =
   controller.getEBupotUnifikasiTagihanPemotonganById;
 const saveEBupotUnifikasiTagihanPemotongan =
   controller.saveEBupotUnifikasiTagihanPemotongan;
 const generateIdBillingEBupotUnifikasiTagihanPemotongan =
   controller.generateIdBillingEBupotUnifikasiTagihanPemotongan;
+const setorEBupotUnifikasiTagihanPemotongan =
+  controller.setorEBupotUnifikasiTagihanPemotongan;
 const updateEBupotUnifikasiTagihanPemotongan =
   controller.updateEBupotUnifikasiTagihanPemotongan;
 const deleteEBupotUnifikasiTagihanPemotongan =
@@ -44,6 +48,11 @@ router.post(
   getEBupotUnifikasiTagihanPemotongansByUserSearchPagination
 );
 router.post(
+  "/eBupotUnifikasiTagihanPemotonganByNtpnUser",
+  verifyUser,
+  getEBupotUnifikasiTagihanPemotonganByNtpnUser
+);
+router.post(
   "/eBupotUnifikasiTagihanPemotongans/:id",
   verifyUser,
   getEBupotUnifikasiTagihanPemotonganById
@@ -57,6 +66,11 @@ router.post(
   "/generateIdBillingEBupotUnifikasiTagihanPemotongan/:id",
   verifyUser,
   generateIdBillingEBupotUnifikasiTagihanPemotongan
+);
+router.post(
+  "/setorEBupotUnifikasiTagihanPemotongan/:id",
+  verifyUser,
+  setorEBupotUnifikasiTagihanPemotongan
 );
 router.post(
   "/updateEBupotUnifikasiTagihanPemotongan/:id",
