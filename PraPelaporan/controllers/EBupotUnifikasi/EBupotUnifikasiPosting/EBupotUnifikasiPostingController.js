@@ -17,6 +17,7 @@ const EBilling = require("../../../../EBilling/models/EBilling/EBillingModel.js"
 const Tahun = require("../../../../Master/models/Tahun/TahunModel.js");
 const Negara = require("../../../../Master/models/Negara/NegaraModel.js");
 const EBupotUnifikasiTagihanPemotongan = require("../../../models/EBupotUnifikasi/EBupotUnifikasiTagihanPemotongan/EBupotUnifikasiTagihanPemotonganModel.js");
+const EBupotUnifikasiPenyiapanSpt = require("../../../models/EBupotUnifikasi/EBupotUnifikasiPenyiapanSpt/EBupotUnifikasiPenyiapanSptModel.js");
 
 const eBupotUnifikasiPosting = async (req, res) => {
   let transaction;
@@ -25,6 +26,38 @@ const eBupotUnifikasiPosting = async (req, res) => {
     transaction = await sequelize.transaction(); // Start the transaction
     let tahun = req.body.tahunPajak;
     let bulan = getMonthIndex(req.body.masaPajak);
+
+    let tempWhereEBupotUnifikasiPenyiapanSpt = {
+      masaPajak: bulan,
+      tahunPajak: tahun,
+    };
+
+    let findEBupotUnifikasiPenyiapanSpt =
+      await EBupotUnifikasiPenyiapanSpt.findOne({
+        where: tempWhereEBupotUnifikasiPenyiapanSpt,
+        transaction, // Use transaction here
+      });
+
+    if (!findEBupotUnifikasiPenyiapanSpt) {
+      // Find Tanggal Tagihan Pemotongan
+      let tanggalTagihanPemotongan = new Date();
+
+      findEBupotUnifikasiPenyiapanSpt =
+        await EBupotUnifikasiPenyiapanSpt.create(
+          {
+            tanggalTagihanPemotongan,
+            userEBupotUnifikasiPenyiapanSptId: req.body.userId,
+            masaPajak: bulan,
+            tahunPajak: tahun,
+            pembetulanKe: 0,
+            statusSpt: "Draft",
+            keteranganSpt: "",
+            userIdInput: req.body.userId,
+            cabangId: req.body.kodeCabang,
+          },
+          { transaction }
+        );
+    }
 
     // Delete All Tagihan Pemotongan in Periode
     let tempWhereTagihanPemotongan = {
@@ -129,6 +162,7 @@ const eBupotUnifikasiPosting = async (req, res) => {
           jenis: "PphDisetorSendiri",
           tanggalTagihanPemotongan: new Date(),
           userEBupotUnifikasiTagihanPemotonganId: req.body.userIdInput,
+          ebupotUnifikasiPenyiapanSptId: findEBupotUnifikasiPenyiapanSpt.id,
           nop: "",
           objekPajakId: eBupotUnifikasiPphDisetorSendiri.objekPajakId,
           masaPajak:
@@ -230,6 +264,7 @@ const eBupotUnifikasiPosting = async (req, res) => {
           jenis: "Pph42152223",
           tanggalTagihanPemotongan: new Date(),
           userEBupotUnifikasiTagihanPemotonganId: req.body.userId,
+          ebupotUnifikasiPenyiapanSptId: findEBupotUnifikasiPenyiapanSpt.id,
           nop: "",
           objekPajakId: eBupotUnifikasiPph42152223.objekPajakId,
           masaPajak: eBupotUnifikasiPph42152223.bulanPajak,
@@ -327,6 +362,7 @@ const eBupotUnifikasiPosting = async (req, res) => {
           jenis: "PphNonResiden",
           tanggalTagihanPemotongan: new Date(),
           userEBupotUnifikasiTagihanPemotonganId: req.body.userId,
+          ebupotUnifikasiPenyiapanSptId: findEBupotUnifikasiPenyiapanSpt.id,
           nop: "",
           objekPajakId: eBupotUnifikasiPphNonResiden.objekPajakId,
           masaPajak: eBupotUnifikasiPphNonResiden.bulanPajak,

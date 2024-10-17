@@ -176,6 +176,61 @@ const getEBupotUnifikasiBuktiSetorsByUserSearchPagination = async (
   }
 };
 
+const getEBupotUnifikasiBuktiSetorsByUserForPenyiapanSptPagination = async (
+  req,
+  res
+) => {
+  const page = parseInt(req.query.page) || 0;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search_query || "";
+  const offset = limit * page;
+
+  let tempWhere = {
+    userEBupotUnifikasiBuktiSetorId: req.body.userEBupotUnifikasiBuktiSetorId,
+    [Op.and]: [
+      {
+        "$ebupotunifikasitagihanpemotongan.masaPajak$": req.body.masaPajak,
+      },
+      {
+        "$ebupotunifikasitagihanpemotongan.tahunPajak$": req.body.tahunPajak,
+      },
+    ],
+  };
+  let tempInclude = [
+    { model: User },
+    {
+      model: EBupotUnifikasiTagihanPemotongan,
+      as: "ebupotunifikasitagihanpemotongan",
+    },
+    { model: JenisSetoran, include: [{ model: JenisPajak }] },
+    { model: Cabang },
+  ];
+
+  const totalRows = await EBupotUnifikasiBuktiSetor.count({
+    where: tempWhere,
+    include: tempInclude,
+  });
+  const totalPage = Math.ceil(totalRows / limit);
+  try {
+    const eBupotUnifikasiBuktiSetors = await EBupotUnifikasiBuktiSetor.findAll({
+      where: tempWhere,
+      include: tempInclude,
+      offset: offset,
+      limit: limit,
+    });
+    res.status(200).json({
+      eBupotUnifikasiBuktiSetors,
+      page: page,
+      limit: limit,
+      totalRows: totalRows,
+      totalPage: totalPage,
+    });
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getEBupotUnifikasiBuktiSetorById = async (req, res) => {
   try {
     const eBupotUnifikasiBuktiSetor = await EBupotUnifikasiBuktiSetor.findOne({
@@ -515,6 +570,7 @@ module.exports = {
   getEBupotUnifikasiBuktiSetorsPagination,
   getEBupotUnifikasiBuktiSetorsByUserPagination,
   getEBupotUnifikasiBuktiSetorsByUserSearchPagination,
+  getEBupotUnifikasiBuktiSetorsByUserForPenyiapanSptPagination,
   getEBupotUnifikasiBuktiSetorById,
   saveEBupotUnifikasiBuktiSetor,
   transaksiEBupotUnifikasiBuktiSetor,

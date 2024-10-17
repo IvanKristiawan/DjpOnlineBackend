@@ -8,6 +8,8 @@ const getEBupotUnifikasiBuktiSetorsByUserPagination =
   controller.getEBupotUnifikasiBuktiSetorsByUserPagination;
 const getEBupotUnifikasiBuktiSetorsByUserSearchPagination =
   controller.getEBupotUnifikasiBuktiSetorsByUserSearchPagination;
+const getEBupotUnifikasiBuktiSetorsByUserForPenyiapanSptPagination =
+  controller.getEBupotUnifikasiBuktiSetorsByUserForPenyiapanSptPagination;
 const getEBupotUnifikasiBuktiSetorById =
   controller.getEBupotUnifikasiBuktiSetorById;
 const saveEBupotUnifikasiBuktiSetor = controller.saveEBupotUnifikasiBuktiSetor;
@@ -42,6 +44,11 @@ router.post(
   "/eBupotUnifikasiBuktiSetorsByUserSearchPagination",
   verifyUser,
   getEBupotUnifikasiBuktiSetorsByUserSearchPagination
+);
+router.post(
+  "/eBupotUnifikasiBuktiSetorsByUserForPenyiapanSptPagination",
+  verifyUser,
+  getEBupotUnifikasiBuktiSetorsByUserForPenyiapanSptPagination
 );
 router.post(
   "/eBupotUnifikasiBuktiSetors/:id",
