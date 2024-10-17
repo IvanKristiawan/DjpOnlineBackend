@@ -111,7 +111,9 @@ const eBupotUnifikasiPosting = async (req, res) => {
             eBupotUnifikasiPphDisetorSendiri.ebilling.masaPajakDariBulan,
           tahunPajak: eBupotUnifikasiPphDisetorSendiri.ebilling.tahun.tahun,
           nomorKetetapan: "",
-          jumlahSetor: eBupotUnifikasiPphDisetorSendiri.ebilling.jumlahSetor,
+          pphYangDipotong:
+            eBupotUnifikasiPphDisetorSendiri.ebilling.jumlahSetor,
+          pphYangDisetor: eBupotUnifikasiPphDisetorSendiri.ebilling.jumlahSetor,
           uraian: "",
           npwpPenyetor: eBupotUnifikasiPphDisetorSendiri.user.npwp15,
           nitkuPenyetor: eBupotUnifikasiPphDisetorSendiri.user.nitku,
@@ -128,7 +130,8 @@ const eBupotUnifikasiPosting = async (req, res) => {
         // Update Increment Tagihan Pemotongan
         await EBupotUnifikasiTagihanPemotongan.increment(
           {
-            jumlahSetor: eBupotUnifikasiPphDisetorSendiri.ebilling.jumlahSetor,
+            pphYangDipotong:
+              eBupotUnifikasiPphDisetorSendiri.ebilling.jumlahSetor,
           },
           {
             where: {
@@ -204,7 +207,8 @@ const eBupotUnifikasiPosting = async (req, res) => {
           masaPajak: eBupotUnifikasiPph42152223.bulanPajak,
           tahunPajak: eBupotUnifikasiPph42152223.tahunPajak,
           nomorKetetapan: "",
-          jumlahSetor: eBupotUnifikasiPph42152223.pPhYangDipotongDipungut,
+          pphYangDipotong: eBupotUnifikasiPph42152223.pPhYangDipotongDipungut,
+          pphYangDisetor: 0,
           uraian: "",
           npwpPenyetor: eBupotUnifikasiPph42152223.user.npwp15,
           nitkuPenyetor: eBupotUnifikasiPph42152223.user.nitku,
@@ -221,7 +225,7 @@ const eBupotUnifikasiPosting = async (req, res) => {
         // Update Increment Tagihan Pemotongan
         await EBupotUnifikasiTagihanPemotongan.increment(
           {
-            jumlahSetor: eBupotUnifikasiPph42152223.pPhYangDipotongDipungut,
+            pphYangDipotong: eBupotUnifikasiPph42152223.pPhYangDipotongDipungut,
           },
           {
             where: {
@@ -298,7 +302,8 @@ const eBupotUnifikasiPosting = async (req, res) => {
           masaPajak: eBupotUnifikasiPphNonResiden.bulanPajak,
           tahunPajak: eBupotUnifikasiPphNonResiden.tahunPajak,
           nomorKetetapan: "",
-          jumlahSetor: eBupotUnifikasiPphNonResiden.pPhYangDipotongDipungut,
+          pphYangDipotong: eBupotUnifikasiPphNonResiden.pPhYangDipotongDipungut,
+          pphYangDisetor: 0,
           uraian: "",
           npwpPenyetor: eBupotUnifikasiPphNonResiden.user.npwp15,
           nitkuPenyetor: eBupotUnifikasiPphNonResiden.user.nitku,
@@ -315,7 +320,8 @@ const eBupotUnifikasiPosting = async (req, res) => {
         // Update Increment Tagihan Pemotongan
         await EBupotUnifikasiTagihanPemotongan.increment(
           {
-            jumlahSetor: eBupotUnifikasiPphNonResiden.pPhYangDipotongDipungut,
+            pphYangDipotong:
+              eBupotUnifikasiPphNonResiden.pPhYangDipotongDipungut,
           },
           {
             where: {

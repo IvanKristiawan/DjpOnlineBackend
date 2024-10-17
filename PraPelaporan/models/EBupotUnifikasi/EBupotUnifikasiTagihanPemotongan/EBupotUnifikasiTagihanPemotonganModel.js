@@ -43,8 +43,13 @@ const EBupotUnifikasiTagihanPemotongan = sequelize.define(
       default: "",
       allowNull: true,
     },
-    jumlahSetor: {
+    pphYangDipotong: {
       type: DataTypes.DOUBLE,
+      allowNull: false,
+    },
+    pphYangDisetor: {
+      type: DataTypes.DOUBLE,
+      default: 0,
       allowNull: false,
     },
 
