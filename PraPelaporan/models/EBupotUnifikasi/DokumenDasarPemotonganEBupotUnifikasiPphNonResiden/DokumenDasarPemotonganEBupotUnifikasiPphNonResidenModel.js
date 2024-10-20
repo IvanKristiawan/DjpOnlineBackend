@@ -6,7 +6,7 @@ const Cabang = require("../../../../Master/models/Cabang/CabangModel.js");
 const { DataTypes } = Sequelize;
 
 const DokumenDasarPemotonganEBupotUnifikasiPphNonResiden = sequelize.define(
-  "dokumendasarpemotonganebupotunifikasipphNonResidens",
+  "dokumendasarpemotonganebupotunifikasipphnonresidens",
   {
     namaDokumen: {
       type: DataTypes.STRING,

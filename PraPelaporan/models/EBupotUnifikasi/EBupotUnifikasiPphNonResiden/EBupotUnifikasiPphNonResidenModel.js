@@ -9,7 +9,7 @@ const Cabang = require("../../../../Master/models/Cabang/CabangModel.js");
 const { DataTypes } = Sequelize;
 
 const EBupotUnifikasiPphNonResiden = sequelize.define(
-  "ebupotunifikasipphNonResidens",
+  "ebupotunifikasipphnonresidens",
   {
     nomorBuktiSetor: {
       type: DataTypes.STRING,
