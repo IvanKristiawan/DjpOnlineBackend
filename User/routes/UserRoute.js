@@ -5,6 +5,7 @@ const updateUser = content.updateUser;
 const updateUserPassword = content.updateUserPassword;
 const updateUserHakAkses = content.updateUserHakAkses;
 const updateUserThenLogin = content.updateUserThenLogin;
+const updateAuthKeyUserThenLogin = content.updateAuthKeyUserThenLogin;
 const updateUserThenLoginNoKewajiban = content.updateUserThenLoginNoKewajiban;
 const deleteUser = content.deleteUser;
 const getUser = content.getUser;
@@ -23,6 +24,11 @@ router.post("/users/:id", verifyUser, updateUser);
 router.post("/updateUserPassword/:id", verifyUser, updateUserPassword);
 router.post("/updateUserHakAkses/:id", verifyUser, updateUserHakAkses);
 router.post("/updateUserThenLogin/:id", verifyUser, updateUserThenLogin);
+router.post(
+  "/updateAuthKeyUserThenLogin/:id",
+  verifyUser,
+  updateAuthKeyUserThenLogin
+);
 router.post(
   "/updateUserThenLoginNoKewajiban/:id",
   verifyUser,

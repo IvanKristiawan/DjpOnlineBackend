@@ -285,6 +285,58 @@ const updateUserThenLogin = async (req, res) => {
   }
 };
 
+const updateAuthKeyUserThenLogin = async (req, res) => {
+  let transaction;
+  try {
+    transaction = await sequelize.transaction();
+
+    await User.update(
+      {
+        authKey: req.body.authKey,
+      },
+      {
+        where: {
+          id: req.params.id,
+        },
+      }
+    );
+
+    const user = await User.findOne({
+      where: {
+        id: req.params.id,
+      },
+      include: [{ model: KelompokKegiatanEkonomiKlu }, { model: Cabang }],
+    });
+
+    const hakAkses = await HakAkses.findOne({
+      where: {
+        userId: req.params.id,
+      },
+    });
+
+    const token = jwt.sign({ id: user.id }, process.env.JWT, {
+      expiresIn: "15d",
+    });
+
+    const { password, ...otherDetails } = user.dataValues;
+
+    await transaction.commit();
+    res.status(200).json({
+      details: {
+        ...otherDetails,
+        token,
+        akses: hakAkses,
+      },
+    });
+  } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
 const updateUserThenLoginNoKewajiban = async (req, res) => {
   let transaction;
   try {
@@ -782,6 +834,7 @@ module.exports = {
   updateUserPassword,
   updateUserHakAkses,
   updateUserThenLogin,
+  updateAuthKeyUserThenLogin,
   updateUserThenLoginNoKewajiban,
   deleteUser,
   getUser,

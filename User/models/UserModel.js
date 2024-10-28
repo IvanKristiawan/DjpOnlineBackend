@@ -145,6 +145,11 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    authKey: {
+      type: DataTypes.STRING,
+      defaultValue: "",
+      allowNull: true,
+    },
     tipeUser: {
       type: DataTypes.STRING,
       default: "ADMIN", // ADMIN, MANAGER, OWNER
