@@ -9,6 +9,8 @@ const getEBupotUnifikasiPenyiapanSptsByUserPagination =
   controller.getEBupotUnifikasiPenyiapanSptsByUserPagination;
 const getEBupotUnifikasiPenyiapanSptsByUserSearchPagination =
   controller.getEBupotUnifikasiPenyiapanSptsByUserSearchPagination;
+const getEBupotUnifikasiCombinedPagination =
+  controller.getEBupotUnifikasiCombinedPagination;
 const getEBupotUnifikasiPenyiapanSptById =
   controller.getEBupotUnifikasiPenyiapanSptById;
 const saveEBupotUnifikasiPenyiapanSpt =
@@ -40,6 +42,11 @@ router.post(
   "/eBupotUnifikasiPenyiapanSptsByUserSearchPagination",
   verifyUser,
   getEBupotUnifikasiPenyiapanSptsByUserSearchPagination
+);
+router.post(
+  "/eBupotUnifikasiCombinedPagination",
+  verifyUser,
+  getEBupotUnifikasiCombinedPagination
 );
 router.post(
   "/eBupotUnifikasiPenyiapanSpts/:id",

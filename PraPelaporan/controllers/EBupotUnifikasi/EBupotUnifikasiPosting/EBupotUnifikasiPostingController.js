@@ -18,6 +18,9 @@ const Tahun = require("../../../../Master/models/Tahun/TahunModel.js");
 const Negara = require("../../../../Master/models/Negara/NegaraModel.js");
 const EBupotUnifikasiTagihanPemotongan = require("../../../models/EBupotUnifikasi/EBupotUnifikasiTagihanPemotongan/EBupotUnifikasiTagihanPemotonganModel.js");
 const EBupotUnifikasiPenyiapanSpt = require("../../../models/EBupotUnifikasi/EBupotUnifikasiPenyiapanSpt/EBupotUnifikasiPenyiapanSptModel.js");
+const EBupotUnifikasiPosting = require("../../../models/EBupotUnifikasi/EBupotUnifikasiPosting/EBupotUnifikasiPostingModel.js");
+const JenisSetoran = require("../../../../Master/models/JenisSetoran/JenisSetoranModel.js");
+const JenisPajak = require("../../../../Master/models/JenisPajak/JenisPajakModel.js");
 
 const eBupotUnifikasiPosting = async (req, res) => {
   let transaction;
@@ -59,7 +62,7 @@ const eBupotUnifikasiPosting = async (req, res) => {
         );
     }
 
-    // Delete All Tagihan Pemotongan in Periode
+    // Update All Tagihan Pemotongan in Periode
     let tempWhereTagihanPemotongan = {
       masaPajak: bulan,
       tahunPajak: tahun,
@@ -75,7 +78,7 @@ const eBupotUnifikasiPosting = async (req, res) => {
       }
     );
 
-    // Delete All Tagihan Pemotongan in Periode PphDisetorSendiri
+    // Update All Tagihan Pemotongan in Periode PphDisetorSendiri
     let tempWhereTagihanPemotonganPphDisetorSendiri = {
       masaPajak: bulan,
       tahunPajak: tahun,
@@ -92,6 +95,45 @@ const eBupotUnifikasiPosting = async (req, res) => {
         transaction, // Ensure transaction is used
       }
     );
+
+    // Delete Posting in Periode
+    let tempWhereEBupotUnifikasiPosting = {
+      masaPajak: bulan,
+      tahunPajak: tahun,
+    };
+
+    await EBupotUnifikasiPosting.destroy({
+      where: tempWhereEBupotUnifikasiPosting,
+      transaction,
+    });
+
+    // Create EBupotUnifikasiPosting
+    const objekPajaks = await ObjekPajak.findAll({
+      where: {
+        isBupotUnifikasi: true,
+      },
+    });
+
+    let tempNewEBupotUnifikasiPosting = [];
+    for (let objekPajak of objekPajaks) {
+      let objectEBupotUnifikasiPosting = {
+        tanggalEBupotUnifikasiPosting: new Date(),
+        userEBupotUnifikasiPostingId: req.body.userIdInput,
+        masaPajak: bulan,
+        tahunPajak: tahun,
+        ebupotUnifikasiPenyiapanSptId: findEBupotUnifikasiPenyiapanSpt.id,
+        objekPajakId: objekPajak.id,
+        jumlahDpp: 0,
+        jumlahPph: 0,
+        userIdInput: req.body.userId,
+        cabangId: req.body.kodeCabang,
+      };
+
+      tempNewEBupotUnifikasiPosting.push(objectEBupotUnifikasiPosting);
+    }
+    await EBupotUnifikasiPosting.bulkCreate(tempNewEBupotUnifikasiPosting, {
+      transaction,
+    });
 
     // 01.) Posting EBupotUnifikasiPphDisetorSendiri
     let tempWhereEBupotUnifikasiPphDisetorSendiri = {
@@ -202,6 +244,22 @@ const eBupotUnifikasiPosting = async (req, res) => {
           }
         );
       }
+
+      // Update Increment EBupotUnifikasiPosting
+      await EBupotUnifikasiPosting.increment(
+        {
+          jumlahDpp: eBupotUnifikasiPphDisetorSendiri.jumlahPenghasilanBruto,
+          jumlahPph: eBupotUnifikasiPphDisetorSendiri.ebilling.jumlahSetor,
+        },
+        {
+          where: {
+            masaPajak: bulan,
+            tahunPajak: tahun,
+            objekPajakId: eBupotUnifikasiPphDisetorSendiri.objekpajak.id,
+          },
+          transaction, // Ensure transaction is used
+        }
+      );
     }
 
     // 02.) Posting EBupotUnifikasiPph42152223
@@ -299,6 +357,22 @@ const eBupotUnifikasiPosting = async (req, res) => {
           }
         );
       }
+
+      // Update Increment EBupotUnifikasiPosting
+      await EBupotUnifikasiPosting.increment(
+        {
+          jumlahDpp: eBupotUnifikasiPph42152223.jumlahPenghasilanBruto,
+          jumlahPph: eBupotUnifikasiPph42152223.pPhYangDipotongDipungut,
+        },
+        {
+          where: {
+            masaPajak: bulan,
+            tahunPajak: tahun,
+            objekPajakId: eBupotUnifikasiPph42152223.objekpajak.id,
+          },
+          transaction, // Ensure transaction is used
+        }
+      );
     }
 
     // 03.) Posting EBupotUnifikasiPphNonResiden
@@ -398,6 +472,22 @@ const eBupotUnifikasiPosting = async (req, res) => {
           }
         );
       }
+
+      // Update Increment EBupotUnifikasiPosting
+      await EBupotUnifikasiPosting.increment(
+        {
+          jumlahDpp: eBupotUnifikasiPphNonResiden.jumlahPenghasilanBruto,
+          jumlahPph: eBupotUnifikasiPphNonResiden.pPhYangDipotongDipungut,
+        },
+        {
+          where: {
+            masaPajak: bulan,
+            tahunPajak: tahun,
+            objekPajakId: eBupotUnifikasiPphNonResiden.objekpajak.id,
+          },
+          transaction, // Ensure transaction is used
+        }
+      );
     }
 
     // Commit the transaction
@@ -412,6 +502,108 @@ const eBupotUnifikasiPosting = async (req, res) => {
   }
 };
 
+const getEBupotUnifikasiPostingDoss = async (req, res) => {
+  try {
+    let tempWhere = {
+      "$objekpajak.isBupotUnifikasi$": true,
+      "$objekpajak.bupotUnifikasiDoss$": true,
+    };
+    let tempInclude = [
+      { model: User },
+      {
+        model: ObjekPajak,
+        as: "objekpajak",
+        include: [
+          {
+            model: JenisSetoran,
+            as: "jenissetoran",
+            include: [
+              {
+                model: JenisPajak,
+                as: "jenispajak",
+              },
+            ],
+          },
+        ],
+      },
+      { model: Cabang },
+    ];
+
+    const eBupotUnifikasiPostings = await EBupotUnifikasiPosting.findAll({
+      where: tempWhere,
+      include: tempInclude,
+      order: [
+        [{ model: ObjekPajak, as: "objekpajak" }, "kodeObjekPajak", "ASC"],
+      ],
+    });
+    res.status(200).json(eBupotUnifikasiPostings);
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getEBupotUnifikasiPostingsDossPagination = async (req, res) => {
+  const page = parseInt(req.query.page) || 0;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search_query || "";
+  const offset = limit * page;
+  let tempWhere = {
+    "$objekpajak.isBupotUnifikasi$": true,
+    "$objekpajak.bupotUnifikasiDoss$": true,
+  };
+  let tempInclude = [
+    { model: User },
+    {
+      model: ObjekPajak,
+      as: "objekpajak",
+      include: [
+        {
+          model: JenisSetoran,
+          as: "jenissetoran",
+          include: [
+            {
+              model: JenisPajak,
+              as: "jenispajak",
+            },
+          ],
+        },
+      ],
+    },
+    { model: Cabang },
+  ];
+
+  const totalRows = await EBupotUnifikasiPosting.count({
+    where: tempWhere,
+    include: tempInclude,
+  });
+  const totalPage = Math.ceil(totalRows / limit);
+
+  try {
+    const eBupotUnifikasiPostings = await EBupotUnifikasiPosting.findAll({
+      where: tempWhere,
+      include: tempInclude,
+      offset: offset,
+      limit: limit,
+      order: [
+        [{ model: ObjekPajak, as: "objekpajak" }, "kodeObjekPajak", "ASC"],
+      ],
+    });
+    res.status(200).json({
+      eBupotUnifikasiPostings,
+      page: page,
+      limit: limit,
+      totalRows: totalRows,
+      totalPage: totalPage,
+    });
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   eBupotUnifikasiPosting,
+  getEBupotUnifikasiPostingDoss,
+  getEBupotUnifikasiPostingsDossPagination,
 };

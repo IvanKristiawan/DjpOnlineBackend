@@ -240,3 +240,7 @@ Content-Type: application/json
 ### Migrasi Tahun
 POST http://localhost:5000/migrasiTahun
 Content-Type: application/json
+
+### Update Untuk Bupot Unifikasi Objek Pajak
+POST http://localhost:5000/updateUntukBupotUnifikasiObjekPajak
+Content-Type: application/json

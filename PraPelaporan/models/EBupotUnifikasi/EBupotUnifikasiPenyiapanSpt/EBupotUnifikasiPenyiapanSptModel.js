@@ -66,27 +66,12 @@ const EBupotUnifikasiPenyiapanSpt = sequelize.define(
       defaultValue: 0,
       allowNull: false,
     },
-    pphPasal24YangDapatDiperhitungkanJumlahDasar: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-      allowNull: false,
-    },
     pphPasal24YangDapatDiperhitungkanJumlahPph: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
       allowNull: false,
     },
-    pphYangDipotongPihakLainJumlahDasar: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-      allowNull: false,
-    },
     pphYangDipotongPihakLainJumlahPph: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-      allowNull: false,
-    },
-    pphYangDisetorSendiriJumlahDasar: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
       allowNull: false,

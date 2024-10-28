@@ -23,7 +23,7 @@ const getObjekPajaksBupot = async (req, res) => {
   try {
     const objekPajaks = await ObjekPajak.findAll({
       where: {
-        kodeBupot: req.body.kodeBupot,
+        untukBupotUnifikasi: req.body.untukBupotUnifikasi,
       },
       order: [["kodeObjekPajak", "ASC"]],
       include: [{ model: JenisSetoran }, { model: Cabang }],

@@ -32,6 +32,21 @@ const ObjekPajak = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    isBupotUnifikasi: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    untukBupotUnifikasi: {
+      type: DataTypes.STRING, // PPh 42152223, PPh Non Residen, PPh DOSS
+      default: "",
+      allowNull: true,
+    },
+    bupotUnifikasiDoss: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
     pilihanPerkiraanPenghasilanNetto: {
       type: DataTypes.STRING,
       allowNull: false,

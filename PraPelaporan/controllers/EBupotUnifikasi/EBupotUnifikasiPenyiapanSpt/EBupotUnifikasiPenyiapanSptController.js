@@ -6,9 +6,15 @@ const User = require("../../../../User/models/UserModel.js");
 const Penandatangan = require("../../../models/Penandatangan/PenandatanganModel.js");
 const Cabang = require("../../../../Master/models/Cabang/CabangModel.js");
 const EBupotUnifikasiTagihanPemotongan = require("../../../models/EBupotUnifikasi/EBupotUnifikasiTagihanPemotongan/EBupotUnifikasiTagihanPemotonganModel.js");
+const EBupotUnifikasiPosting = require("../../../models/EBupotUnifikasi/EBupotUnifikasiPosting/EBupotUnifikasiPostingModel.js");
 const ObjekPajak = require("../../../../Master/models/ObjekPajak/ObjekPajakModel.js");
 const JenisSetoran = require("../../../../Master/models/JenisSetoran/JenisSetoranModel.js");
 const JenisPajak = require("../../../../Master/models/JenisPajak/JenisPajakModel.js");
+const EBupotUnifikasiPphDisetorSendiri = require("../../../models/EBupotUnifikasi/EBupotUnifikasiPphDisetorSendiri/EBupotUnifikasiPphDisetorSendiriModel.js");
+const EBilling = require("../../../../EBilling/models/EBilling/EBillingModel.js");
+const EBupotUnifikasiPph42152223 = require("../../../models/EBupotUnifikasi/EBupotUnifikasiPph42152223/EBupotUnifikasiPph42152223Model.js");
+const EBupotUnifikasiPphNonResiden = require("../../../models/EBupotUnifikasi/EBupotUnifikasiPphNonResiden/EBupotUnifikasiPphNonResidenModel.js");
+const Negara = require("../../../../Master/models/Negara/NegaraModel.js");
 
 const getEBupotUnifikasiPenyiapanSpts = async (req, res) => {
   try {
@@ -219,6 +225,139 @@ const getEBupotUnifikasiPenyiapanSptsByUserSearchPagination = async (
   }
 };
 
+const getEBupotUnifikasiCombinedPagination = async (req, res) => {
+  const page = parseInt(req.query.page) || 0;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search_query || "";
+  const offset = limit * page;
+
+  let userIdInput = req.body.userIdInput;
+  let combinedData = [];
+
+  // Define the where conditions for each type
+  const whereConditions = [
+    {
+      model: EBupotUnifikasiPphDisetorSendiri,
+      condition: {
+        userIdInput,
+      },
+      include: [
+        { model: User },
+        { model: EBilling },
+        {
+          model: ObjekPajak,
+          as: "objekpajak",
+          include: [
+            {
+              model: JenisSetoran,
+              as: "jenissetoran",
+              include: [
+                {
+                  model: JenisPajak,
+                  as: "jenispajak",
+                },
+              ],
+            },
+          ],
+        },
+        { model: Cabang },
+      ],
+    },
+    {
+      model: EBupotUnifikasiPph42152223,
+      condition: {
+        userIdInput,
+      },
+      include: [
+        { model: User },
+        { model: Penandatangan },
+        {
+          model: ObjekPajak,
+          as: "objekpajak",
+          include: [
+            {
+              model: JenisSetoran,
+              as: "jenissetoran",
+              include: [
+                {
+                  model: JenisPajak,
+                  as: "jenispajak",
+                },
+              ],
+            },
+          ],
+        },
+        { model: Cabang },
+      ],
+    },
+    {
+      model: EBupotUnifikasiPphNonResiden,
+      condition: {
+        userIdInput,
+      },
+      include: [
+        { model: User },
+        { model: Negara },
+        { model: Penandatangan },
+        {
+          model: ObjekPajak,
+          as: "objekpajak",
+          include: [
+            {
+              model: JenisSetoran,
+              as: "jenissetoran",
+              include: [
+                {
+                  model: JenisPajak,
+                  as: "jenispajak",
+                },
+              ],
+            },
+          ],
+        },
+        { model: Cabang },
+      ],
+    },
+  ];
+
+  try {
+    // Perform each query and get counts
+    const results = await Promise.all(
+      whereConditions.map(async ({ model, condition, include }) => {
+        const totalRows = await model.count({ where: condition, include });
+        const data = await model.findAll({
+          where: condition,
+          include,
+          offset,
+          limit,
+        });
+        return { totalRows, data };
+      })
+    );
+
+    // Aggregate data and total counts
+    results.forEach(({ totalRows, data }) => {
+      combinedData = [...combinedData, ...data];
+    });
+
+    const totalRows = results.reduce(
+      (sum, result) => sum + result.totalRows,
+      0
+    );
+    const totalPage = Math.ceil(totalRows / limit);
+
+    res.status(200).json({
+      data: combinedData,
+      page,
+      limit,
+      totalRows,
+      totalPage,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getEBupotUnifikasiPenyiapanSptById = async (req, res) => {
   try {
     let eBupotUnifikasiPenyiapanSpt = await EBupotUnifikasiPenyiapanSpt.findOne(
@@ -291,6 +430,7 @@ const updateEBupotUnifikasiPenyiapanSpt = async (req, res) => {
       },
     });
 
+    // 02.) Update E-Bupot Unifikasi Penyiapan Spt
     let updatedEBupotUnifikasiPenyiapanSpt =
       await EBupotUnifikasiPenyiapanSpt.update(
         {
@@ -304,6 +444,29 @@ const updateEBupotUnifikasiPenyiapanSpt = async (req, res) => {
           transaction,
         }
       );
+
+    // 03.) Update E-Bupot Unifikasi Posting
+    const eBupotUnifikasiPostings = Object.entries(
+      req.body.eBupotUnifikasiPosting
+    ).map(([id, values]) => ({
+      id,
+      ...values,
+    }));
+
+    for (let eBupotUnifikasiPosting of eBupotUnifikasiPostings) {
+      await EBupotUnifikasiPosting.update(
+        {
+          jumlahDpp: eBupotUnifikasiPosting.jumlahDpp,
+          jumlahPph: eBupotUnifikasiPosting.jumlahPph,
+        },
+        {
+          where: {
+            id: eBupotUnifikasiPosting.id,
+          },
+          transaction,
+        }
+      );
+    }
 
     // Status 201 = Created
     await transaction.commit();
@@ -349,6 +512,7 @@ module.exports = {
   getEBupotUnifikasiPenyiapanSptsPagination,
   getEBupotUnifikasiPenyiapanSptsByUserPagination,
   getEBupotUnifikasiPenyiapanSptsByUserSearchPagination,
+  getEBupotUnifikasiCombinedPagination,
   getEBupotUnifikasiPenyiapanSptById,
   saveEBupotUnifikasiPenyiapanSpt,
   updateEBupotUnifikasiPenyiapanSpt,

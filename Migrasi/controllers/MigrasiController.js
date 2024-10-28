@@ -440,6 +440,148 @@ const updateKodeBupotObjekPajak = async (req, res) => {
   }
 };
 
+const updateUntukBupotUnifikasiObjekPajak = async (req, res) => {
+  Object.keys(req.body).forEach(function (k) {
+    if (typeof req.body[k] == "string") {
+      req.body[k] = req.body[k].toUpperCase().trim();
+    }
+  });
+  let transaction;
+
+  try {
+    transaction = await sequelize.transaction();
+    let no = 0;
+
+    const objekPajaks = await ObjekPajak.findAll({
+      order: [["kodeObjekPajak", "ASC"]],
+      include: [{ model: JenisSetoran }, { model: Cabang }],
+    });
+
+    for (let objekPajak of objekPajaks) {
+      if (objekPajak.kodeBupot === "0") {
+        await ObjekPajak.update(
+          {
+            untukBupotUnifikasi: "PPh 42152223",
+          },
+          {
+            where: {
+              kodeObjekPajak: objekPajak.kodeObjekPajak,
+            },
+          }
+        );
+      } else if (objekPajak.kodeBupot === "1") {
+        await ObjekPajak.update(
+          {
+            untukBupotUnifikasi: "PPh Non Residen",
+          },
+          {
+            where: {
+              kodeObjekPajak: objekPajak.kodeObjekPajak,
+            },
+          }
+        );
+      }
+
+      no++;
+      console.log(no);
+    }
+
+    // Status 201 = Created
+    // await transaction.commit();
+    res.status(200).json("Untuk Bupot Unifikasi Objek Pajak data updated!");
+  } catch (error) {
+    console.log(error);
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const migrasiObjekPajakBupotUnifikasiDoss = async (req, res) => {
+  Object.keys(req.body).forEach(function (k) {
+    if (typeof req.body[k] == "string") {
+      req.body[k] = req.body[k].toUpperCase().trim();
+    }
+  });
+  let transaction;
+
+  try {
+    transaction = await sequelize.transaction();
+
+    for (let i = 0; i < req.body.length; i++) {
+      const objekPajak = await ObjekPajak.findOne({
+        where: {
+          kodeObjekPajak: req.body[i].kodeObjekPajak,
+        },
+        order: [["kodeObjekPajak", "ASC"]],
+        include: [{ model: JenisSetoran }, { model: Cabang }],
+      });
+
+      if (objekPajak) {
+        await ObjekPajak.update(
+          {
+            bupotUnifikasiDoss: true,
+          },
+          {
+            where: {
+              kodeObjekPajak: req.body[i].kodeObjekPajak,
+            },
+          }
+        );
+      } else {
+        let parts = req.body[i].kodeObjekPajak.split("-"); // Split the string into ["24", "104", "02"]
+        let kodeJenisSetoran = parts[1];
+
+        const jenisSetoran = await JenisSetoran.findOne({
+          where: {
+            kodeJenisSetoran: kodeJenisSetoran,
+            "$jenispajak.kodeJenisPajak$": {
+              [Op.like]: req.body[i].jenisPajak,
+            },
+          },
+          include: [
+            {
+              model: JenisPajak,
+              as: "jenispajak",
+              attributes: ["kodeJenisPajak", "namaJenisPajak"],
+            },
+          ],
+        });
+
+        // console.log(req.body[i].kodeObjekPajak);
+        if (jenisSetoran) {
+          // console.log(jenisSetoran.dataValues);
+          const insertedObjekPajak = await ObjekPajak.create({
+            ...req.body[i],
+            kodeObjekPajak: req.body[i].kodeObjekPajak,
+            namaObjekPajak: req.body[i].namaObjekPajak,
+            jenisSetoranId: jenisSetoran.id,
+            kodeBupot: "0",
+            untukBupotUnifikasi: "PPh DOSS",
+            bupotUnifikasiDoss: true,
+            cabangId: "001",
+          });
+        } else {
+          // console.log(req.body[i].kodeObjekPajak);
+        }
+      }
+    }
+
+    // Status 201 = Created
+    // await transaction.commit();
+    res.status(200).json("Objek Pajak data migrated!");
+  } catch (error) {
+    console.log(error);
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
 const migrasiNegara = async (req, res) => {
   Object.keys(req.body).forEach(function (k) {
     if (typeof req.body[k] == "string") {
@@ -484,5 +626,7 @@ module.exports = {
   migrasiObjekPajak,
   updateTarifPersenObjekPajak,
   updateKodeBupotObjekPajak,
+  updateUntukBupotUnifikasiObjekPajak,
+  migrasiObjekPajakBupotUnifikasiDoss,
   migrasiNegara,
 };

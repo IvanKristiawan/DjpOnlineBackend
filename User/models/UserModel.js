@@ -141,6 +141,10 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    passphrase: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     tipeUser: {
       type: DataTypes.STRING,
       default: "ADMIN", // ADMIN, MANAGER, OWNER
