@@ -15,6 +15,8 @@ const EBilling = require("../../../../EBilling/models/EBilling/EBillingModel.js"
 const EBupotUnifikasiPph42152223 = require("../../../models/EBupotUnifikasi/EBupotUnifikasiPph42152223/EBupotUnifikasiPph42152223Model.js");
 const EBupotUnifikasiPphNonResiden = require("../../../models/EBupotUnifikasi/EBupotUnifikasiPphNonResiden/EBupotUnifikasiPphNonResidenModel.js");
 const Negara = require("../../../../Master/models/Negara/NegaraModel.js");
+const { generateRandomNumberString } = require("../../../../helper/helper.js");
+const Tahun = require("../../../../Master/models/Tahun/TahunModel.js");
 
 const getEBupotUnifikasiPenyiapanSpts = async (req, res) => {
   try {
@@ -154,7 +156,113 @@ const getEBupotUnifikasiPenyiapanSptsByUserSearchPagination = async (
         offset: offset,
         limit: limit,
       });
-    console.log(eBupotUnifikasiPenyiapanSpts.length);
+    // console.log(eBupotUnifikasiPenyiapanSpts.length);
+
+    let tempEBupotUnifikasiPenyiapanSpts = [];
+    for (let eBupotUnifikasiPenyiapanSpt of eBupotUnifikasiPenyiapanSpts) {
+      const eBupotUnifikasiTagihanPemotongans =
+        await EBupotUnifikasiTagihanPemotongan.findAll({
+          where: {
+            ebupotUnifikasiPenyiapanSptId: eBupotUnifikasiPenyiapanSpt.id,
+          },
+          include: [
+            { model: User },
+            {
+              model: ObjekPajak,
+              include: [
+                {
+                  model: JenisSetoran,
+                  as: "jenissetoran",
+                  include: [
+                    {
+                      model: JenisPajak,
+                      as: "jenispajak",
+                    },
+                  ],
+                },
+              ],
+            },
+            { model: Cabang },
+          ],
+        });
+
+      // Use map and reduce to calculate the total pphYangDipotong
+      const totalPphYangDipotong = eBupotUnifikasiTagihanPemotongans
+        .map((record) => record.pphYangDipotong) // Extract the 'pphYangDipotong' field
+        .reduce((acc, curr) => acc + curr, 0); // Sum all values
+
+      // Use map and reduce to calculate the total pphYangDisetor
+      const totalPphYangDisetor = eBupotUnifikasiTagihanPemotongans
+        .map((record) => record.pphYangDisetor) // Extract the 'pphYangDipotong' field
+        .reduce((acc, curr) => acc + curr, 0); // Sum all values
+
+      let jumlahPphKurangSetor = totalPphYangDipotong - totalPphYangDisetor;
+      let keteranganSpt = "";
+      if (jumlahPphKurangSetor === 0) {
+        keteranganSpt = "SPT Anda siap kirim";
+      } else {
+        keteranganSpt =
+          "Terdapat Kekurangan Setor, Silahkan cek kembali SPT Anda.";
+      }
+
+      let objectData = {
+        ...eBupotUnifikasiPenyiapanSpt.dataValues,
+        jumlahPphKurangSetor: totalPphYangDipotong - totalPphYangDisetor,
+        keteranganSpt,
+      };
+
+      tempEBupotUnifikasiPenyiapanSpts.push(objectData);
+    }
+
+    res.status(200).json({
+      eBupotUnifikasiPenyiapanSpts: tempEBupotUnifikasiPenyiapanSpts,
+      page: page,
+      limit: limit,
+      totalRows: totalRows,
+      totalPage: totalPage,
+    });
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getEBupotUnifikasiPenyiapanSptsTerkirimByUserSearchPagination = async (
+  req,
+  res
+) => {
+  const page = parseInt(req.query.page) || 0;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search_query || "";
+  const offset = limit * page;
+
+  let tempWhere = {
+    userEBupotUnifikasiPenyiapanSptId:
+      req.body.userEBupotUnifikasiPenyiapanSptId,
+    noBpeNtte: {
+      [Op.ne]: "",
+    },
+  };
+  let tempInclude = [
+    { model: User },
+    { model: Penandatangan },
+    { model: Cabang },
+  ];
+
+  const totalRows = await EBupotUnifikasiPenyiapanSpt.count({
+    where: tempWhere,
+    include: tempInclude,
+  });
+  const totalPage = Math.ceil(totalRows / limit);
+  try {
+    const eBupotUnifikasiPenyiapanSpts =
+      await EBupotUnifikasiPenyiapanSpt.findAll({
+        where: tempWhere,
+        include: tempInclude,
+        offset: offset,
+        limit: limit,
+      });
+    // console.log(eBupotUnifikasiPenyiapanSpts.length);
 
     let tempEBupotUnifikasiPenyiapanSpts = [];
     for (let eBupotUnifikasiPenyiapanSpt of eBupotUnifikasiPenyiapanSpts) {
@@ -234,16 +342,31 @@ const getEBupotUnifikasiCombinedPagination = async (req, res) => {
   let userIdInput = req.body.userIdInput;
   let combinedData = [];
 
+  let bulan = req.body.masaPajak;
+  let tahun = req.body.tahunPajak;
+
   // Define the where conditions for each type
   const whereConditions = [
     {
       model: EBupotUnifikasiPphDisetorSendiri,
       condition: {
         userIdInput,
+        [Op.and]: [
+          {
+            "$ebilling.masaPajakDariBulan$": bulan,
+          },
+          {
+            "$ebilling.tahun.tahun$": tahun,
+          },
+        ],
       },
       include: [
         { model: User },
-        { model: EBilling },
+        {
+          model: EBilling,
+          as: "ebilling",
+          include: [{ model: Tahun, as: "tahun" }],
+        },
         {
           model: ObjekPajak,
           as: "objekpajak",
@@ -267,6 +390,14 @@ const getEBupotUnifikasiCombinedPagination = async (req, res) => {
       model: EBupotUnifikasiPph42152223,
       condition: {
         userIdInput,
+        [Op.and]: [
+          {
+            bulanPajak: bulan,
+          },
+          {
+            tahunPajak: tahun,
+          },
+        ],
       },
       include: [
         { model: User },
@@ -294,6 +425,14 @@ const getEBupotUnifikasiCombinedPagination = async (req, res) => {
       model: EBupotUnifikasiPphNonResiden,
       condition: {
         userIdInput,
+        [Op.and]: [
+          {
+            bulanPajak: bulan,
+          },
+          {
+            tahunPajak: tahun,
+          },
+        ],
       },
       include: [
         { model: User },
@@ -412,6 +551,116 @@ const saveEBupotUnifikasiPenyiapanSpt = async (req, res) => {
   }
 };
 
+const kirimSptEBupotUnifikasiPenyiapanSpt = async (req, res) => {
+  Object.keys(req.body).forEach(function (k) {
+    if (typeof req.body[k] == "string") {
+      req.body[k] = req.body[k].toUpperCase().trim();
+    }
+  });
+  let transaction;
+  try {
+    transaction = await sequelize.transaction();
+
+    let eBupotUnifikasiPenyiapanSpt = await EBupotUnifikasiPenyiapanSpt.findOne(
+      {
+        where: {
+          id: req.params.id,
+        },
+        include: [{ model: User }, { model: Penandatangan }, { model: Cabang }],
+        transaction,
+      }
+    );
+
+    if (eBupotUnifikasiPenyiapanSpt.noBpeNtte.length === 0) {
+      // Kirim Spt
+      let tempNoBpeNtte = generateRandomNumberString(20);
+
+      let updatedEBupotUnifikasiPenyiapanSpt =
+        await EBupotUnifikasiPenyiapanSpt.update(
+          {
+            noBpeNtte: tempNoBpeNtte,
+            tanggalKirim: new Date(),
+          },
+          {
+            where: {
+              id: req.params.id,
+            },
+            transaction,
+          }
+        );
+    } else {
+      // Pembetulan Ke Spt
+      await EBupotUnifikasiPenyiapanSpt.increment("pembetulanKe", {
+        by: 1,
+        where: {
+          id: req.params.id,
+        },
+        transaction,
+      });
+
+      let updatedEBupotUnifikasiPenyiapanSpt =
+        await EBupotUnifikasiPenyiapanSpt.update(
+          {
+            tanggalKirim: new Date(),
+          },
+          {
+            where: {
+              id: req.params.id,
+            },
+            transaction,
+          }
+        );
+    }
+
+    // Status 201 = Created
+    await transaction.commit();
+    res.status(201).json("Spt Terkirim!");
+  } catch (error) {
+    console.log(error);
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const ajukanUnduhBuktiPotongEBupotUnifikasiPenyiapanSpt = async (req, res) => {
+  Object.keys(req.body).forEach(function (k) {
+    if (typeof req.body[k] == "string") {
+      req.body[k] = req.body[k].toUpperCase().trim();
+    }
+  });
+  let transaction;
+  try {
+    transaction = await sequelize.transaction();
+
+    let updatedEBupotUnifikasiPenyiapanSpt =
+      await EBupotUnifikasiPenyiapanSpt.update(
+        {
+          ajukanUnduhBuktiPotong: true,
+        },
+        {
+          where: {
+            id: req.params.id,
+          },
+          transaction,
+        }
+      );
+
+    // Status 201 = Created
+    await transaction.commit();
+    res.status(201).json("Unduh Bukti Potong Terajukan!");
+  } catch (error) {
+    console.log(error);
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
 const updateEBupotUnifikasiPenyiapanSpt = async (req, res) => {
   Object.keys(req.body).forEach(function (k) {
     if (typeof req.body[k] == "string") {
@@ -512,9 +761,12 @@ module.exports = {
   getEBupotUnifikasiPenyiapanSptsPagination,
   getEBupotUnifikasiPenyiapanSptsByUserPagination,
   getEBupotUnifikasiPenyiapanSptsByUserSearchPagination,
+  getEBupotUnifikasiPenyiapanSptsTerkirimByUserSearchPagination,
   getEBupotUnifikasiCombinedPagination,
   getEBupotUnifikasiPenyiapanSptById,
   saveEBupotUnifikasiPenyiapanSpt,
+  kirimSptEBupotUnifikasiPenyiapanSpt,
+  ajukanUnduhBuktiPotongEBupotUnifikasiPenyiapanSpt,
   updateEBupotUnifikasiPenyiapanSpt,
   deleteEBupotUnifikasiPenyiapanSpt,
 };

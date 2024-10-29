@@ -9,12 +9,18 @@ const getEBupotUnifikasiPenyiapanSptsByUserPagination =
   controller.getEBupotUnifikasiPenyiapanSptsByUserPagination;
 const getEBupotUnifikasiPenyiapanSptsByUserSearchPagination =
   controller.getEBupotUnifikasiPenyiapanSptsByUserSearchPagination;
+const getEBupotUnifikasiPenyiapanSptsTerkirimByUserSearchPagination =
+  controller.getEBupotUnifikasiPenyiapanSptsTerkirimByUserSearchPagination;
 const getEBupotUnifikasiCombinedPagination =
   controller.getEBupotUnifikasiCombinedPagination;
 const getEBupotUnifikasiPenyiapanSptById =
   controller.getEBupotUnifikasiPenyiapanSptById;
 const saveEBupotUnifikasiPenyiapanSpt =
   controller.saveEBupotUnifikasiPenyiapanSpt;
+const kirimSptEBupotUnifikasiPenyiapanSpt =
+  controller.kirimSptEBupotUnifikasiPenyiapanSpt;
+const ajukanUnduhBuktiPotongEBupotUnifikasiPenyiapanSpt =
+  controller.ajukanUnduhBuktiPotongEBupotUnifikasiPenyiapanSpt;
 const updateEBupotUnifikasiPenyiapanSpt =
   controller.updateEBupotUnifikasiPenyiapanSpt;
 const deleteEBupotUnifikasiPenyiapanSpt =
@@ -44,6 +50,11 @@ router.post(
   getEBupotUnifikasiPenyiapanSptsByUserSearchPagination
 );
 router.post(
+  "/eBupotUnifikasiPenyiapanSptsTerkirimByUserSearchPagination",
+  verifyUser,
+  getEBupotUnifikasiPenyiapanSptsTerkirimByUserSearchPagination
+);
+router.post(
   "/eBupotUnifikasiCombinedPagination",
   verifyUser,
   getEBupotUnifikasiCombinedPagination
@@ -57,6 +68,16 @@ router.post(
   "/saveEBupotUnifikasiPenyiapanSpt",
   verifyUser,
   saveEBupotUnifikasiPenyiapanSpt
+);
+router.post(
+  "/kirimSptEBupotUnifikasiPenyiapanSpt/:id",
+  verifyUser,
+  kirimSptEBupotUnifikasiPenyiapanSpt
+);
+router.post(
+  "/ajukanUnduhBuktiPotongEBupotUnifikasiPenyiapanSpt/:id",
+  verifyUser,
+  ajukanUnduhBuktiPotongEBupotUnifikasiPenyiapanSpt
 );
 router.post(
   "/updateEBupotUnifikasiPenyiapanSpt/:id",
