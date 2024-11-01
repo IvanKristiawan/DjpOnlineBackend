@@ -70,8 +70,8 @@ const EBupotUnifikasiPphNonResiden = sequelize.define(
     },
     tanggalLahir: {
       type: DataTypes.DATE,
-      default: new Date(),
-      allowNull: false,
+      default: null,
+      allowNull: true,
     },
     noKitasKitap: {
       type: DataTypes.STRING,

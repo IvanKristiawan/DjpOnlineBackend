@@ -360,6 +360,7 @@ const saveEBupotUnifikasiPph42152223 = async (req, res) => {
           {
             ...dasarPemotongan,
             eBupotUnifikasiPph42152223Id: insertedEBupotUnifikasiPph42152223.id,
+            userIdInput: req.body.userIdInput,
             cabangId: req.body.kodeCabang,
           },
           { transaction }

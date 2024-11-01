@@ -55,6 +55,14 @@ formatDate = (date) => {
   })}/${tempDate.getFullYear()}`;
 };
 
+formatTextToDate = (dateStr) => {
+  // Split the input date string by '/'
+  let [day, month, year] = dateStr.split("/");
+
+  // Return the formatted date in 'YYYY-MM-DD'
+  return `${year}-${month}-${day}`;
+};
+
 function countDays(t) {
   var cd = 24 * 60 * 60 * 1000,
     ch = 60 * 60 * 1000,
@@ -173,6 +181,11 @@ getMonthIndex = (month) => {
   }
 };
 
+getMonthName = (monthNumber) => {
+  // Adjust for 0-based index (e.g., 11 -> "November")
+  return masaPajakList[monthNumber - 1] || "Invalid month number";
+};
+
 generateIdBilling = () => {
   // Generate a random number and convert it to a string
   let randomNumber = Math.random().toString().slice(2); // Remove "0."
@@ -209,18 +222,67 @@ generateRandomNumberString = (length) => {
   return result;
 };
 
+let namaDokumenOptions = [
+  {
+    kode: "01",
+    label: "Faktur Pajak",
+  },
+  {
+    kode: "02",
+    label: "Invoice",
+  },
+  {
+    kode: "03",
+    label: "Pengumuman",
+  },
+  {
+    kode: "04",
+    label: "Surat Perjanjian",
+  },
+  {
+    kode: "05",
+    label: "Bukti Pembayaran",
+  },
+  {
+    kode: "06",
+    label: "Akta Perikatan",
+  },
+  {
+    kode: "07",
+    label: "Akta RUPS",
+  },
+  {
+    kode: "08",
+    label: "Surat Pernyataan",
+  },
+];
+
+getNamaDokumenByKode = (kode) => {
+  const document = namaDokumenOptions.find((item) => item.kode == kode);
+  return document ? document.label : "Kode tidak ditemukan";
+};
+
+isNotDateFormat = (input) => {
+  const regex = /^\d{2}\/\d{2}\/\d{4}$/;
+  return !regex.test(input); // returns true if the format does not match
+};
+
 module.exports = {
   findNextKode,
   findNextKodeJenisCOA,
   findNextKodeSubGroupCOA,
   formatDate,
+  formatTextToDate,
   countDays,
   findTotalDays,
   findRomanDate,
   customRound,
   addMonths,
   getMonthIndex,
+  getMonthName,
   generateIdBilling,
   generateRandomString,
   generateRandomNumberString,
+  getNamaDokumenByKode,
+  isNotDateFormat,
 };
