@@ -140,11 +140,6 @@ const getJenisSetoranById = async (req, res) => {
 };
 
 const saveJenisSetoran = async (req, res) => {
-  Object.keys(req.body).forEach(function (k) {
-    if (typeof req.body[k] == "string") {
-      req.body[k] = req.body[k].toUpperCase().trim();
-    }
-  });
   let transaction;
 
   try {

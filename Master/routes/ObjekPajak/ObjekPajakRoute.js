@@ -3,6 +3,7 @@ const controller = require("../../controllers/ObjekPajak/ObjekPajakController.js
 const verify = require("../../../utils/verifyToken.js");
 const getObjekPajaks = controller.getObjekPajaks;
 const getObjekPajaksBupot = controller.getObjekPajaksBupot;
+const getObjekPajaksBupot2126 = controller.getObjekPajaksBupot2126;
 const getObjekPajakNextKode = controller.getObjekPajakNextKode;
 const getObjekPajaksByJenisSetoran = controller.getObjekPajaksByJenisSetoran;
 const getObjekPajaksPagination = controller.getObjekPajaksPagination;
@@ -17,6 +18,7 @@ const router = express.Router();
 
 router.post("/objekPajaks", verifyUser, getObjekPajaks);
 router.post("/objekPajaksBupot", verifyUser, getObjekPajaksBupot);
+router.post("/objekPajaksBupot2126", verifyUser, getObjekPajaksBupot2126);
 router.post("/objekPajakNextKode", verifyUser, getObjekPajakNextKode);
 router.post(
   "/objekPajaksByJenisSetoran",

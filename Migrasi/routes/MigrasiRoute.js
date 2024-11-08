@@ -9,9 +9,10 @@ const updateTarifPersenObjekPajak = controller.updateTarifPersenObjekPajak;
 const updateKodeBupotObjekPajak = controller.updateKodeBupotObjekPajak;
 const updateUntukBupotUnifikasiObjekPajak =
   controller.updateUntukBupotUnifikasiObjekPajak;
-const migrasiObjekPajakBupotUnifikasiDoss =
-  controller.migrasiObjekPajakBupotUnifikasiDoss;
+const migrasiObjekPajakBupotUnifikasiDopp =
+  controller.migrasiObjekPajakBupotUnifikasiDopp;
 const migrasiNegara = controller.migrasiNegara;
+const migrasiTer = controller.migrasiTer;
 
 const router = express.Router();
 
@@ -27,9 +28,10 @@ const router = express.Router();
 //   updateUntukBupotUnifikasiObjekPajak
 // );
 // router.post(
-//   "/migrasiObjekPajakBupotUnifikasiDoss",
-//   migrasiObjekPajakBupotUnifikasiDoss
+//   "/migrasiObjekPajakBupotUnifikasiDopp",
+//   migrasiObjekPajakBupotUnifikasiDopp
 // );
 // router.post("/migrasiNegara", migrasiNegara);
+// router.post("/migrasiTer", migrasiTer);
 
 module.exports = router;

@@ -13,6 +13,8 @@ const ObjekPajak = require("../../Master/models/ObjekPajak/ObjekPajakModel.js");
 const Negara = require("../../Master/models/Negara/NegaraModel.js");
 const Tahun = require("../../Master/models/Tahun/TahunModel.js");
 const { findNextKode } = require("../../helper/helper.js");
+const Ptkp = require("../../Master/models/Ptkp/PtkpModel.js");
+const Ter = require("../../Master/models/Ter/TerModel.js");
 
 const migrasiKlu = async (req, res) => {
   Object.keys(req.body).forEach(function (k) {
@@ -499,7 +501,7 @@ const updateUntukBupotUnifikasiObjekPajak = async (req, res) => {
   }
 };
 
-const migrasiObjekPajakBupotUnifikasiDoss = async (req, res) => {
+const migrasiObjekPajakBupotUnifikasiDopp = async (req, res) => {
   Object.keys(req.body).forEach(function (k) {
     if (typeof req.body[k] == "string") {
       req.body[k] = req.body[k].toUpperCase().trim();
@@ -522,7 +524,7 @@ const migrasiObjekPajakBupotUnifikasiDoss = async (req, res) => {
       if (objekPajak) {
         await ObjekPajak.update(
           {
-            bupotUnifikasiDoss: true,
+            bupotUnifikasiDopp: true,
           },
           {
             where: {
@@ -560,7 +562,7 @@ const migrasiObjekPajakBupotUnifikasiDoss = async (req, res) => {
             jenisSetoranId: jenisSetoran.id,
             kodeBupot: "0",
             untukBupotUnifikasi: "PPh DOSS",
-            bupotUnifikasiDoss: true,
+            bupotUnifikasiDopp: true,
             cabangId: "001",
           });
         } else {
@@ -618,6 +620,62 @@ const migrasiNegara = async (req, res) => {
   }
 };
 
+const migrasiTer = async (req, res) => {
+  Object.keys(req.body).forEach(function (k) {
+    if (typeof req.body[k] == "string") {
+      req.body[k] = req.body[k].toUpperCase().trim();
+    }
+  });
+  let transaction;
+
+  try {
+    transaction = await sequelize.transaction();
+
+    for (let i = 0; i < req.body.length; i++) {
+      let nextKodeTer = findNextKode(i, 5);
+      let jumlahPenghasilanMin = req.body[i].jumlahPenghasilanMin.replace(
+        /,/g,
+        ""
+      );
+      let jumlahPenghasilanMax = req.body[i].jumlahPenghasilanMax.replace(
+        /,/g,
+        ""
+      );
+
+      let ptkp = await Ptkp.findOne({
+        where: {
+          namaPtkp: req.body[i].ptkp,
+        },
+      });
+
+      let objectTer = {
+        kodeTer: nextKodeTer,
+        jumlahPenghasilanMin,
+        jumlahPenghasilanMax,
+        tarifPersen: req.body[i].tarifPersen,
+        kategori: req.body[i].kategori,
+        ptkpId: ptkp.id,
+        cabangId: "001",
+      };
+
+      const insertedTer = await Ter.create(objectTer);
+
+      console.log(objectTer);
+    }
+
+    // Status 201 = Created
+    // await transaction.commit();
+    res.status(200).json("Ter data migrated!");
+  } catch (error) {
+    console.log(error);
+    if (transaction) {
+      await transaction.rollback();
+    }
+    // Error 400 = Kesalahan dari sisi user
+    res.status(400).json({ message: error.message });
+  }
+};
+
 module.exports = {
   migrasiKlu,
   migrasiJenisPajak,
@@ -627,6 +685,7 @@ module.exports = {
   updateTarifPersenObjekPajak,
   updateKodeBupotObjekPajak,
   updateUntukBupotUnifikasiObjekPajak,
-  migrasiObjekPajakBupotUnifikasiDoss,
+  migrasiObjekPajakBupotUnifikasiDopp,
   migrasiNegara,
+  migrasiTer,
 };

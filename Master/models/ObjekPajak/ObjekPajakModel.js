@@ -28,10 +28,8 @@ const ObjekPajak = sequelize.define(
       type: DataTypes.DOUBLE,
       allowNull: false,
     },
-    kodeBupot: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
+
+    // EBupot Unifikasi
     isBupotUnifikasi: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
@@ -42,7 +40,7 @@ const ObjekPajak = sequelize.define(
       default: "",
       allowNull: true,
     },
-    bupotUnifikasiDoss: {
+    bupotUnifikasiDopp: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false,
@@ -54,6 +52,63 @@ const ObjekPajak = sequelize.define(
     perkiraanPenghasilanNetto: {
       type: DataTypes.DOUBLE,
       allowNull: false,
+    },
+
+    // EBupot 2126
+    isBupot2126: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    untukBupot2126: {
+      type: DataTypes.STRING, // PPh 21, PPh 26
+      default: "",
+      allowNull: true,
+    },
+    bupot2126SkemaPenghitungan: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    bupot2126PtkpTahunan: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    bupot2126JenisObjekPajak: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    bupot2126DasarPengenaanPajak: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    bupot2126DasarPengenaanPajakBebasInput: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    bupot2126DasarPengenaanPajakAkumulasiPenghasilanBruto: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    bupot2126FormulasiPenghitungan: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    bupot2126FasilitasDtpIkn: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    tarifBupot2126: {
+      type: DataTypes.STRING, // TER, PKP, Formulasi Penghitungan, Bebas Input, Ditentukan Jenis Objek Pajak
+      default: "",
+      allowNull: true,
     },
 
     // Foreign Key Jenis Setoran

@@ -10,7 +10,15 @@ const getObjekPajaks = async (req, res) => {
   try {
     const objekPajaks = await ObjekPajak.findAll({
       order: [["kodeObjekPajak", "ASC"]],
-      include: [{ model: JenisSetoran }, { model: Cabang }],
+      include: [
+        {
+          model: JenisSetoran,
+          include: {
+            model: JenisPajak,
+          },
+        },
+        { model: Cabang },
+      ],
     });
     res.status(200).json(objekPajaks);
   } catch (error) {
@@ -24,6 +32,22 @@ const getObjekPajaksBupot = async (req, res) => {
     const objekPajaks = await ObjekPajak.findAll({
       where: {
         untukBupotUnifikasi: req.body.untukBupotUnifikasi,
+      },
+      order: [["kodeObjekPajak", "ASC"]],
+      include: [{ model: JenisSetoran }, { model: Cabang }],
+    });
+    res.status(200).json(objekPajaks);
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getObjekPajaksBupot2126 = async (req, res) => {
+  try {
+    const objekPajaks = await ObjekPajak.findAll({
+      where: {
+        untukBupot2126: req.body.untukBupot2126,
       },
       order: [["kodeObjekPajak", "ASC"]],
       include: [{ model: JenisSetoran }, { model: Cabang }],
@@ -151,6 +175,10 @@ const getObjekPajaksPagination = async (req, res) => {
   const totalRows = await ObjekPajak.count({
     where: tempWhere,
     include: tempInclude,
+    order: [
+      [JenisSetoran, "kodeJenisSetoran", "ASC"],
+      ["kodeObjekPajak", "ASC"],
+    ],
   });
   const totalPage = Math.ceil(totalRows / limit);
   try {
@@ -351,6 +379,7 @@ const deleteObjekPajak = async (req, res) => {
 module.exports = {
   getObjekPajaks,
   getObjekPajaksBupot,
+  getObjekPajaksBupot2126,
   getObjekPajakNextKode,
   getObjekPajaksByJenisSetoran,
   getObjekPajaksPagination,

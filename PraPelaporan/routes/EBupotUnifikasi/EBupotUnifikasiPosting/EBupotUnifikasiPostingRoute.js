@@ -2,23 +2,23 @@ const express = require("express");
 const controller = require("../../../controllers/EBupotUnifikasi/EBupotUnifikasiPosting/EBupotUnifikasiPostingController.js");
 const verify = require("../../../../utils/verifyToken.js");
 const eBupotUnifikasiPosting = controller.eBupotUnifikasiPosting;
-const getEBupotUnifikasiPostingDoss = controller.getEBupotUnifikasiPostingDoss;
-const getEBupotUnifikasiPostingsDossPagination =
-  controller.getEBupotUnifikasiPostingsDossPagination;
+const getEBupotUnifikasiPostingDopp = controller.getEBupotUnifikasiPostingDopp;
+const getEBupotUnifikasiPostingsDoppPagination =
+  controller.getEBupotUnifikasiPostingsDoppPagination;
 const verifyUser = verify.verifyUser;
 
 const router = express.Router();
 
 router.post("/eBupotUnifikasiPosting", verifyUser, eBupotUnifikasiPosting);
 router.post(
-  "/getEBupotUnifikasiPostingDoss",
+  "/getEBupotUnifikasiPostingDopp",
   verifyUser,
-  getEBupotUnifikasiPostingDoss
+  getEBupotUnifikasiPostingDopp
 );
 router.post(
-  "/eBupotUnifikasiPostingsDossPagination",
+  "/eBupotUnifikasiPostingsDoppPagination",
   verifyUser,
-  getEBupotUnifikasiPostingsDossPagination
+  getEBupotUnifikasiPostingsDoppPagination
 );
 
 module.exports = router;

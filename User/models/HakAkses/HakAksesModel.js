@@ -147,6 +147,36 @@ const HakAkses = sequelize.define(
       defaultValue: false,
       allowNull: false,
     },
+    ptkp: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    ter: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    jenisObjekPajak: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    pkp: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    tarifPph21PP68Tahun2009: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    tarifPph21PP149Tahun2000: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
     negara: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,

@@ -502,11 +502,11 @@ const eBupotUnifikasiPosting = async (req, res) => {
   }
 };
 
-const getEBupotUnifikasiPostingDoss = async (req, res) => {
+const getEBupotUnifikasiPostingDopp = async (req, res) => {
   try {
     let tempWhere = {
       "$objekpajak.isBupotUnifikasi$": true,
-      "$objekpajak.bupotUnifikasiDoss$": true,
+      "$objekpajak.bupotUnifikasiDopp$": true,
     };
     let tempInclude = [
       { model: User },
@@ -543,14 +543,14 @@ const getEBupotUnifikasiPostingDoss = async (req, res) => {
   }
 };
 
-const getEBupotUnifikasiPostingsDossPagination = async (req, res) => {
+const getEBupotUnifikasiPostingsDoppPagination = async (req, res) => {
   const page = parseInt(req.query.page) || 0;
   const limit = parseInt(req.query.limit) || 10;
   const search = req.query.search_query || "";
   const offset = limit * page;
   let tempWhere = {
     "$objekpajak.isBupotUnifikasi$": true,
-    "$objekpajak.bupotUnifikasiDoss$": true,
+    "$objekpajak.bupotUnifikasiDopp$": true,
   };
   let tempInclude = [
     { model: User },
@@ -604,6 +604,6 @@ const getEBupotUnifikasiPostingsDossPagination = async (req, res) => {
 
 module.exports = {
   eBupotUnifikasiPosting,
-  getEBupotUnifikasiPostingDoss,
-  getEBupotUnifikasiPostingsDossPagination,
+  getEBupotUnifikasiPostingDopp,
+  getEBupotUnifikasiPostingsDoppPagination,
 };
