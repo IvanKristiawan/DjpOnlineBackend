@@ -30,6 +30,9 @@ const TahunRoute = require("./Master/routes/Tahun/TahunRoute.js");
 const CabangRoute = require("./Master/routes/Cabang/CabangRoute.js");
 // Import EBilling
 const EBillingRoute = require("./EBilling/routes/EBilling/EBillingRoute.js");
+// Import EBupot 2126
+const EBupot2126Pph21Route = require("./PraPelaporan/routes/EBupot2126/EBupot2126Pph21/EBupot2126Pph21Route.js");
+const EBupot2126PenandatanganRoute = require("./PraPelaporan/routes/EBupot2126/Penandatangan/EBupot2126PenandatanganRoute.js");
 // Import EBupot Unifikasi Pph Disetor Sendiri
 const EBupotUnifikasiPphDisetorSendiriRoute = require("./PraPelaporan/routes/EBupotUnifikasi/EBupotUnifikasiPphDisetorSendiri/EBupotUnifikasiPphDisetorSendiriRoute.js");
 const EBupotUnifikasiPph42152223Route = require("./PraPelaporan/routes/EBupotUnifikasi/EBupotUnifikasiPph42152223/EBupotUnifikasiPph42152223Route.js");
@@ -78,6 +81,9 @@ app.use(TahunRoute);
 app.use(CabangRoute);
 // EBilling
 app.use(EBillingRoute);
+// EBupot 2126
+app.use(EBupot2126Pph21Route);
+app.use(EBupot2126PenandatanganRoute);
 // EBupot Unifikasi
 app.use(EBupotUnifikasiPphDisetorSendiriRoute);
 app.use(EBupotUnifikasiPph42152223Route);
