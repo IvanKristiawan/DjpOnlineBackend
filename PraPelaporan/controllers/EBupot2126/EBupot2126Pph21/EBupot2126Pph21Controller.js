@@ -83,6 +83,125 @@ const getEBupot2126Pph21sByUserForExcel = async (req, res) => {
   }
 };
 
+const getEBupot2126Pph21sBulananByUserForExcel = async (req, res) => {
+  try {
+    const eBupot2126Pph21s = await EBupot2126Pph21.findAll({
+      where: {
+        userEBupot2126Pph21Id: req.body.userEBupot2126Pph21Id,
+        [Op.or]: [
+          {
+            "$objekpajak.kodeObjekPajak$": "21-100-01",
+          },
+          {
+            "$objekpajak.kodeObjekPajak$": "21-100-02",
+          },
+        ],
+      },
+      include: [
+        { model: User },
+        { model: EBupot2126Penandatangan },
+        {
+          model: ObjekPajak,
+          include: [{ model: JenisSetoran, include: [{ model: JenisPajak }] }],
+        },
+        { model: Cabang },
+      ],
+    });
+
+    let filteredEBupot2126Pph21s = [];
+
+    for (let eBupot2126Pph21 of eBupot2126Pph21s) {
+      let objectData = {
+        NO_BUKTI_POTONG: eBupot2126Pph21.nomorBuktiSetor,
+        TANGGAL_BUKTI_POTONG: formatDate(eBupot2126Pph21.tanggalBuktiSetor),
+        NPWP_PEMOTONG: eBupot2126Pph21.user.npwp15,
+        NAMA_PEMOTONG: eBupot2126Pph21.user.nama,
+        PEREKAM: eBupot2126Pph21.user.npwp15,
+        IDENTITAS_PENERIMA_PENGHASILAN:
+          eBupot2126Pph21.identitas === "NPWP/NITKU"
+            ? eBupot2126Pph21.npwpNitku
+            : eBupot2126Pph21.nik,
+        NAMA_PENERIMA_PENGHASILAN: eBupot2126Pph21.nama,
+        PENGHASILAN_BRUTO: eBupot2126Pph21.jumlahPenghasilanBruto,
+        PPH_DIPOTONG: eBupot2126Pph21.pPhYangDipotongDipungut,
+        KODE_OBJEK_PAJAK: eBupot2126Pph21.objekpajak.kodeObjekPajak,
+
+        PASAL:
+          eBupot2126Pph21.objekpajak.jenissetoran.jenispajak.namaJenisPajak,
+
+        MASA_PAJAK: eBupot2126Pph21.bulanPajak,
+        TAHUN_PAJAK: eBupot2126Pph21.tahunPajak,
+        STATUS: eBupot2126Pph21.isHapus ? "Dihapus" : "Normal",
+        REV_NO: 0,
+        POSTING: eBupot2126Pph21.isPost ? "Sudah" : "Belum",
+      };
+      filteredEBupot2126Pph21s.push(objectData);
+    }
+
+    res.status(200).json(filteredEBupot2126Pph21s);
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getEBupot2126Pph21sFinalByUserForExcel = async (req, res) => {
+  try {
+    const eBupot2126Pph21s = await EBupot2126Pph21.findAll({
+      where: {
+        userEBupot2126Pph21Id: req.body.userEBupot2126Pph21Id,
+        "$objekpajak.kodeObjekPajak$": {
+          [Op.notIn]: ["21-100-01", "21-100-02"], // Exclude these values
+        },
+      },
+      include: [
+        { model: User },
+        { model: EBupot2126Penandatangan },
+        {
+          model: ObjekPajak,
+          include: [{ model: JenisSetoran, include: [{ model: JenisPajak }] }],
+        },
+        { model: Cabang },
+      ],
+    });
+
+    let filteredEBupot2126Pph21s = [];
+
+    for (let eBupot2126Pph21 of eBupot2126Pph21s) {
+      let objectData = {
+        NO_BUKTI_POTONG: eBupot2126Pph21.nomorBuktiSetor,
+        TANGGAL_BUKTI_POTONG: formatDate(eBupot2126Pph21.tanggalBuktiSetor),
+        NPWP_PEMOTONG: eBupot2126Pph21.user.npwp15,
+        NAMA_PEMOTONG: eBupot2126Pph21.user.nama,
+        PEREKAM: eBupot2126Pph21.user.npwp15,
+        IDENTITAS_PENERIMA_PENGHASILAN:
+          eBupot2126Pph21.identitas === "NPWP/NITKU"
+            ? eBupot2126Pph21.npwpNitku
+            : eBupot2126Pph21.nik,
+        NAMA_PENERIMA_PENGHASILAN: eBupot2126Pph21.nama,
+        PENGHASILAN_BRUTO: eBupot2126Pph21.jumlahPenghasilanBruto,
+        PPH_DIPOTONG: eBupot2126Pph21.pPhYangDipotongDipungut,
+        KODE_OBJEK_PAJAK: eBupot2126Pph21.objekpajak.kodeObjekPajak,
+
+        PASAL:
+          eBupot2126Pph21.objekpajak.jenissetoran.jenispajak.namaJenisPajak,
+
+        MASA_PAJAK: eBupot2126Pph21.bulanPajak,
+        TAHUN_PAJAK: eBupot2126Pph21.tahunPajak,
+        STATUS: eBupot2126Pph21.isHapus ? "Dihapus" : "Normal",
+        REV_NO: 0,
+        POSTING: eBupot2126Pph21.isPost ? "Sudah" : "Belum",
+      };
+      filteredEBupot2126Pph21s.push(objectData);
+    }
+
+    res.status(200).json(filteredEBupot2126Pph21s);
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getEBupot2126Pph21sPagination = async (req, res) => {
   const page = parseInt(req.query.page) || 0;
   const limit = parseInt(req.query.limit) || 10;
@@ -246,6 +365,199 @@ const getEBupot2126Pph21sByUserSearchPagination = async (req, res) => {
   }
 };
 
+const getEBupot2126Pph21sBulananByUserSearchPagination = async (req, res) => {
+  const page = parseInt(req.query.page) || 0;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search_query || "";
+  const offset = limit * page;
+
+  let tempWhere = {
+    userEBupot2126Pph21Id: req.body.userEBupot2126Pph21Id,
+    [Op.or]: [
+      {
+        "$objekpajak.kodeObjekPajak$": "21-100-01",
+      },
+      {
+        "$objekpajak.kodeObjekPajak$": "21-100-02",
+      },
+    ],
+  };
+  let tempInclude = [
+    { model: User },
+    { model: EBupot2126Penandatangan },
+    { model: ObjekPajak, as: "objekpajak" },
+    { model: Cabang },
+  ];
+
+  if (req.body.pencairanBerdasarkan === "Periode") {
+    let [bulan, tahun] = req.body.masaTahunPajakSearch.split("-");
+    tempWhere = {
+      [Op.and]: [
+        tempWhere,
+        {
+          bulanPajak: bulan,
+        },
+        {
+          tahunPajak: tahun,
+        },
+      ],
+    };
+  } else if (req.body.pencairanBerdasarkan === "Nomor Bukti Setor") {
+    tempWhere["nomorBuktiSetor"] = req.body.nomorBuktiSetor;
+  } else if (req.body.pencairanBerdasarkan === "Identitas") {
+    tempWhere = {
+      userEBupot2126Pph21Id: req.body.userEBupot2126Pph21Id,
+      [Op.or]: [
+        {
+          npwpNitku: req.body.identitas,
+        },
+        {
+          nik: req.body.identitas,
+        },
+      ],
+    };
+  }
+
+  const totalRows = await EBupot2126Pph21.count({
+    where: tempWhere,
+    include: tempInclude,
+  });
+  const totalPage = Math.ceil(totalRows / limit);
+  try {
+    const eBupot2126Pph21s = await EBupot2126Pph21.findAll({
+      where: tempWhere,
+      include: tempInclude,
+      offset: offset,
+      limit: limit,
+    });
+    res.status(200).json({
+      eBupot2126Pph21s,
+      page: page,
+      limit: limit,
+      totalRows: totalRows,
+      totalPage: totalPage,
+    });
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getEBupot2126Pph21sFinalByUserSearchPagination = async (req, res) => {
+  const page = parseInt(req.query.page) || 0;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search_query || "";
+  const offset = limit * page;
+
+  let tempWhere = {
+    userEBupot2126Pph21Id: req.body.userEBupot2126Pph21Id,
+    "$objekpajak.kodeObjekPajak$": {
+      [Op.notIn]: ["21-100-01", "21-100-02"], // Exclude these values
+    },
+  };
+  let tempInclude = [
+    { model: User },
+    { model: EBupot2126Penandatangan },
+    { model: ObjekPajak, as: "objekpajak" },
+    { model: Cabang },
+  ];
+
+  if (req.body.pencairanBerdasarkan === "Periode") {
+    let [bulan, tahun] = req.body.masaTahunPajakSearch.split("-");
+    tempWhere = {
+      [Op.and]: [
+        tempWhere,
+        {
+          bulanPajak: bulan,
+        },
+        {
+          tahunPajak: tahun,
+        },
+      ],
+    };
+  } else if (req.body.pencairanBerdasarkan === "Nomor Bukti Setor") {
+    tempWhere["nomorBuktiSetor"] = req.body.nomorBuktiSetor;
+  } else if (req.body.pencairanBerdasarkan === "Identitas") {
+    tempWhere = {
+      userEBupot2126Pph21Id: req.body.userEBupot2126Pph21Id,
+      [Op.or]: [
+        {
+          npwpNitku: req.body.identitas,
+        },
+        {
+          nik: req.body.identitas,
+        },
+      ],
+    };
+  }
+
+  const totalRows = await EBupot2126Pph21.count({
+    where: tempWhere,
+    include: tempInclude,
+  });
+  const totalPage = Math.ceil(totalRows / limit);
+  try {
+    const eBupot2126Pph21s = await EBupot2126Pph21.findAll({
+      where: tempWhere,
+      include: tempInclude,
+      offset: offset,
+      limit: limit,
+    });
+    res.status(200).json({
+      eBupot2126Pph21s,
+      page: page,
+      limit: limit,
+      totalRows: totalRows,
+      totalPage: totalPage,
+    });
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getEBupot2126Pph21sBulananByUserSearch = async (req, res) => {
+  let tempWhere = {
+    userEBupot2126Pph21Id: req.body.userEBupot2126Pph21Id,
+    npwpNitku: req.body.npwpNitku,
+    nik: req.body.nik,
+    [Op.and]: [
+      {
+        bulanPajak: req.body.bulanPajak,
+      },
+      {
+        tahunPajak: req.body.tahunPajak,
+      },
+    ],
+    [Op.or]: [
+      {
+        "$objekpajak.kodeObjekPajak$": "21-100-01",
+      },
+      {
+        "$objekpajak.kodeObjekPajak$": "21-100-02",
+      },
+    ],
+  };
+  let tempInclude = [
+    { model: User },
+    { model: EBupot2126Penandatangan },
+    { model: ObjekPajak, as: "objekpajak" },
+    { model: Cabang },
+  ];
+
+  try {
+    const eBupot2126Pph21s = await EBupot2126Pph21.findAll({
+      where: tempWhere,
+      include: tempInclude,
+    });
+
+    res.status(200).json(eBupot2126Pph21s);
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getEBupot2126Pph21ById = async (req, res) => {
   try {
     let eBupot2126Pph21 = await EBupot2126Pph21.findOne({
@@ -267,6 +579,55 @@ const getEBupot2126Pph21ById = async (req, res) => {
     };
 
     res.status(200).json(combinedResult);
+  } catch (error) {
+    // Error 404 = Not Found
+    res.status(404).json({ message: error.message });
+  }
+};
+
+const getEBupot2126Pph21ByNpwpNitku = async (req, res) => {
+  try {
+    let eBupot2126Pph21 = await EBupot2126Pph21.findOne({
+      where: {
+        npwpNitku: req.body.npwpNitku,
+        userEBupot2126Pph21Id: req.body.userEBupot2126Pph21Id,
+      },
+      include: [
+        { model: User },
+        { model: EBupot2126Penandatangan },
+        { model: ObjekPajak },
+        { model: JenisObjekPajak },
+        { model: Ptkp },
+        { model: Cabang },
+      ],
+    });
+
+    res.status(200).json(eBupot2126Pph21);
+  } catch (error) {
+    // Error 404 = Not Found
+    res.status(404).json({ message: error.message });
+  }
+};
+
+const getEBupot2126Pph21ByNik = async (req, res) => {
+  try {
+    let eBupot2126Pph21 = await EBupot2126Pph21.findOne({
+      where: {
+        nik: req.body.nik,
+        nama: req.body.nama,
+        userEBupot2126Pph21Id: req.body.userEBupot2126Pph21Id,
+      },
+      include: [
+        { model: User },
+        { model: EBupot2126Penandatangan },
+        { model: ObjekPajak },
+        { model: JenisObjekPajak },
+        { model: Ptkp },
+        { model: Cabang },
+      ],
+    });
+
+    res.status(200).json(eBupot2126Pph21);
   } catch (error) {
     // Error 404 = Not Found
     res.status(404).json({ message: error.message });
@@ -512,10 +873,17 @@ const deleteEBupot2126Pph21 = async (req, res) => {
 module.exports = {
   getEBupot2126Pph21s,
   getEBupot2126Pph21sByUserForExcel,
+  getEBupot2126Pph21sBulananByUserForExcel,
+  getEBupot2126Pph21sFinalByUserForExcel,
   getEBupot2126Pph21sPagination,
   getEBupot2126Pph21sByUserPagination,
   getEBupot2126Pph21sByUserSearchPagination,
+  getEBupot2126Pph21sBulananByUserSearchPagination,
+  getEBupot2126Pph21sFinalByUserSearchPagination,
+  getEBupot2126Pph21sBulananByUserSearch,
   getEBupot2126Pph21ById,
+  getEBupot2126Pph21ByNpwpNitku,
+  getEBupot2126Pph21ByNik,
   saveEBupot2126Pph21,
   updateEBupot2126Pph21,
   statusDeleteEBupot2126Pph21,
