@@ -105,8 +105,13 @@ const ObjekPajak = sequelize.define(
       defaultValue: false,
       allowNull: false,
     },
+    bupot2126FasilitasSkdWpln: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
     tarifBupot2126: {
-      type: DataTypes.STRING, // TER, PKP, Formulasi Penghitungan, Bebas Input, Ditentukan Jenis Objek Pajak
+      type: DataTypes.STRING, // TER, PKP, Formulasi Penghitungan, Bebas Input, Ditentukan Jenis Objek Pajak, Fix Tarif Persen
       default: "",
       allowNull: true,
     },
