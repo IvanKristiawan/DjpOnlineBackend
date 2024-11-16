@@ -37,6 +37,10 @@ const EBupot2126Pph26Route = require("./PraPelaporan/routes/EBupot2126/EBupot212
 const EBupot2126ImporDataRoute = require("./PraPelaporan/routes/EBupot2126/EBupot2126ImporData/EBupot2126ImporDataRoute.js");
 const EBupot2126DetilValidasiRoute = require("./PraPelaporan/routes/EBupot2126/EBupot2126DetilValidasi/EBupot2126DetilValidasiRoute.js");
 const EBupot2126PenandatanganRoute = require("./PraPelaporan/routes/EBupot2126/Penandatangan/EBupot2126PenandatanganRoute.js");
+const EBupot2126PenyiapanSptRoute = require("./PraPelaporan/routes/EBupot2126/EBupot2126PenyiapanSpt/EBupot2126PenyiapanSptRoute.js");
+const EBupot2126PostingRoute = require("./PraPelaporan/routes/EBupot2126/EBupot2126Posting/EBupot2126PostingRoute.js");
+const EBupot2126TagihanPemotonganRoute = require("./PraPelaporan/routes/EBupot2126/EBupot2126TagihanPemotongan/EBupot2126TagihanPemotonganRoute.js");
+const EBupot2126BuktiSetorRoute = require("./PraPelaporan/routes/EBupot2126/EBupot2126BuktiSetor/EBupot2126BuktiSetorRoute.js");
 // Import EBupot Unifikasi Pph Disetor Sendiri
 const EBupotUnifikasiPphDisetorSendiriRoute = require("./PraPelaporan/routes/EBupotUnifikasi/EBupotUnifikasiPphDisetorSendiri/EBupotUnifikasiPphDisetorSendiriRoute.js");
 const EBupotUnifikasiPph42152223Route = require("./PraPelaporan/routes/EBupotUnifikasi/EBupotUnifikasiPph42152223/EBupotUnifikasiPph42152223Route.js");
@@ -92,6 +96,10 @@ app.use(EBupot2126Pph26Route);
 app.use(EBupot2126ImporDataRoute);
 app.use(EBupot2126DetilValidasiRoute);
 app.use(EBupot2126PenandatanganRoute);
+app.use(EBupot2126PenyiapanSptRoute);
+app.use(EBupot2126PostingRoute);
+app.use(EBupot2126TagihanPemotonganRoute);
+app.use(EBupot2126BuktiSetorRoute);
 // EBupot Unifikasi
 app.use(EBupotUnifikasiPphDisetorSendiriRoute);
 app.use(EBupotUnifikasiPph42152223Route);

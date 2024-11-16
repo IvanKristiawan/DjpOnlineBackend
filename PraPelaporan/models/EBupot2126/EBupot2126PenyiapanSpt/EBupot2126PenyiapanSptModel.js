@@ -1,21 +1,21 @@
 const { Sequelize } = require("sequelize");
 const { sequelize } = require("../../../../config/Database.js");
 const User = require("../../../../User/models/UserModel.js");
-const Penandatangan = require("../../../models/Penandatangan/PenandatanganModel.js");
+const EBupot2126Penandatangan = require("../../../models/EBupot2126/Penandatangan/EBupot2126PenandatanganModel.js");
 const Cabang = require("../../../../Master/models/Cabang/CabangModel.js");
 
 const { DataTypes } = Sequelize;
 
-const EBupotUnifikasiPenyiapanSpt = sequelize.define(
-  "ebupotunifikasipenyiapanspts",
+const EBupot2126PenyiapanSpt = sequelize.define(
+  "ebupot2126penyiapanspts",
   {
     tanggalTagihanPemotongan: {
       type: DataTypes.DATE,
       default: new Date(),
       allowNull: false,
     },
-    // Foreign Key User E-BupotUnifikasiPenyiapanSpt
-    userEBupotUnifikasiPenyiapanSptId: {
+    // Foreign Key User E-Bupot2126PenyiapanSpt
+    userEBupot2126PenyiapanSptId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -40,45 +40,8 @@ const EBupotUnifikasiPenyiapanSpt = sequelize.define(
       allowNull: true,
     },
 
-    // DOSS
-    penghasilanDariIndonesiaJumlahDasar: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-      allowNull: false,
-    },
-    penghasilanDariIndonesiaJumlahPph: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-      allowNull: false,
-    },
-    penghasilanDariLuarIndonesiaJumlahDasar: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-      allowNull: false,
-    },
-    penghasilanDariLuarIndonesiaJumlahPph: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-      allowNull: false,
-    },
-    pphPasal24YangDapatDiperhitungkanJumlahPph: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-      allowNull: false,
-    },
-    pphYangDipotongPihakLainJumlahPph: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-      allowNull: false,
-    },
-    pphYangDisetorSendiriJumlahPph: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-      allowNull: false,
-    },
-
-    // Foreign Key Penandatangan
-    penandatanganId: {
+    // Foreign Key EBupot2126Penandatangan
+    eBupot2126PenandatanganId: {
       type: DataTypes.INTEGER,
       defaultValue: null,
       allowNull: true,
@@ -126,22 +89,22 @@ const EBupotUnifikasiPenyiapanSpt = sequelize.define(
   }
 );
 
-EBupotUnifikasiPenyiapanSpt.belongsTo(User, {
-  foreignKey: "userEBupotUnifikasiPenyiapanSptId",
+EBupot2126PenyiapanSpt.belongsTo(User, {
+  foreignKey: "userEBupot2126PenyiapanSptId",
   targetKey: "id",
 });
 
-EBupotUnifikasiPenyiapanSpt.belongsTo(Penandatangan, {
-  foreignKey: "penandatanganId",
+EBupot2126PenyiapanSpt.belongsTo(EBupot2126Penandatangan, {
+  foreignKey: "eBupot2126PenandatanganId",
   targetKey: "id",
 });
 
-EBupotUnifikasiPenyiapanSpt.belongsTo(Cabang, {
+EBupot2126PenyiapanSpt.belongsTo(Cabang, {
   foreignKey: "cabangId",
   targetKey: "id",
 });
 
-module.exports = EBupotUnifikasiPenyiapanSpt;
+module.exports = EBupot2126PenyiapanSpt;
 
 (async () => {
   await sequelize.sync();
