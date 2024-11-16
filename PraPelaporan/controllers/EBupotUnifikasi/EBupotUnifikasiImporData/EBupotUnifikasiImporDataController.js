@@ -530,7 +530,8 @@ const prepareInputData = (data) => {
   Object.keys(data).forEach((key) => {
     if (data[key] === undefined) data[key] = "";
     if (typeof data[key] === "string")
-      data[key] = data[key].toUpperCase().trim();
+      // data[key] = data[key].toUpperCase().trim();
+      data[key] = data[key].trim();
   });
   return data;
 };
@@ -604,11 +605,11 @@ const processData42152223 = async (
       userEBupotUnifikasiPph42152223Id: req.body.userId,
       tahunPajak,
       bulanPajak: tempBulanPajak,
-      masaPajak: tempMasaPajak,
+      masaPajak: tempMasaPajak.toString().padStart(2, "0"),
       identitas,
       npwpNitku,
       nik,
-      nama,
+      nama: nama.toUpperCase(),
       objekPajakId: findObjekPajak.id,
       jumlahPenghasilanBruto,
       tarif: findObjekPajak.tarifPersen,
@@ -725,9 +726,9 @@ const processDataNR = async (
       userEBupotUnifikasiPphNonResidenId: req.body.userId,
       tahunPajak,
       bulanPajak: tempBulanPajak,
-      masaPajak: tempMasaPajak,
+      masaPajak: tempMasaPajak.toString().padStart(2, "0"),
       tin,
-      nama,
+      nama: nama.toUpperCase(),
       alamat,
       tempatLahir,
       noPaspor,
@@ -751,7 +752,7 @@ const processDataNR = async (
     Object.keys(inputData).forEach((key) => {
       if (inputData[key] === undefined) inputData[key] = "";
       if (typeof inputData[key] === "string")
-        inputData[key] = inputData[key].toUpperCase().trim();
+        inputData[key] = inputData[key].trim();
     });
 
     const insertedEBupotUnifikasiPphNonResiden =
@@ -803,6 +804,34 @@ const saveEBupotUnifikasiImporData = async (req, res) => {
       "Dasar Pemotongan": dataDasarPemotongan,
     } = req.body.jsonData;
 
+    if (dataRekap.length !== 3) {
+      status = "Gagal Validasi";
+      keteranganUpload = "Format Excel tidak sesuai.";
+      // Save EBupotUnifikasiImporData
+      const insertedEBupotUnifikasiImporData =
+        await EBupotUnifikasiImporData.create(
+          {
+            userEBupotUnifikasiImporDataId: req.body.userId,
+            nomorTiket,
+            namaFile: req.body.fileName,
+            tanggalUpload,
+            jumlahBaris: 0,
+            status,
+            keteranganUpload,
+            masaPajak: req.body.masaPajak.toString().padStart(2, "0"),
+            tahunPajak: req.body.tahunPajak,
+            jumlahBuktiPotongPph42152223: 0,
+            jumlahBuktiPotongPphNonResiden: 0,
+            userIdInput: req.body.userId,
+            cabangId: req.body.kodeCabang,
+          },
+          { transaction }
+        );
+      // Commit transaction and respond with success
+      await transaction.commit();
+      res.status(201).json("Saved!");
+      return;
+    }
     const tahunPajak = dataRekap[0]["__EMPTY_3"];
     const masaPajak = dataRekap[0]["__EMPTY_6"];
     const jumlahBuktiPotongPph42152223 = dataRekap[1]["__EMPTY_6"];
@@ -830,7 +859,7 @@ const saveEBupotUnifikasiImporData = async (req, res) => {
             jumlahBaris: 0,
             status,
             keteranganUpload,
-            masaPajak: req.body.masaPajak,
+            masaPajak: req.body.masaPajak.toString().padStart(2, "0"),
             tahunPajak: req.body.tahunPajak,
             jumlahBuktiPotongPph42152223: jumlahBuktiPotongPph42152223,
             jumlahBuktiPotongPphNonResiden: jumlahBuktiPotongPphNonResiden,

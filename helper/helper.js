@@ -267,6 +267,11 @@ isNotDateFormat = (input) => {
   return !regex.test(input); // returns true if the format does not match
 };
 
+formatNumberWithComma = (number) => {
+  // Convert the number to a string and replace the dot with a comma if it exists
+  return number.toString().replace(".", ",");
+};
+
 module.exports = {
   findNextKode,
   findNextKodeJenisCOA,
@@ -285,4 +290,5 @@ module.exports = {
   generateRandomNumberString,
   getNamaDokumenByKode,
   isNotDateFormat,
+  formatNumberWithComma,
 };
