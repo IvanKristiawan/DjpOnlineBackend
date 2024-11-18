@@ -12,6 +12,7 @@ const getUser = content.getUser;
 const getUsers = content.getUsers;
 const getUsersPagination = content.getUsersPagination;
 const getNama = content.getNama;
+const getNpwp = content.getNpwp;
 const getUsersPerCabang = content.getUsersPerCabang;
 const getUsersPerCabangPagination = content.getUsersPerCabangPagination;
 const getUsersPerCabangExceptOwnerPagination =
@@ -42,6 +43,7 @@ router.post("/findUser/:id", verifyUser, getUser);
 router.post("/users", verifyUser, getUsers);
 router.post("/usersPagination", verifyUser, getUsersPagination);
 router.post("/getNama", verifyUser, getNama);
+router.post("/getNpwp", verifyUser, getNpwp);
 router.post("/usersPerCabang", verifyUser, getUsersPerCabang);
 router.post(
   "/usersPerCabangPagination",

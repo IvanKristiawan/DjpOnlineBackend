@@ -6,6 +6,7 @@ const KewajibanPerpajakan = require("../models/KewajibanPerpajakan/KewajibanPerp
 const KelompokKegiatanEkonomiKlu = require("../../Master/models/KelompokKegiatanEkonomiKlu/KelompokKegiatanEkonomiKluModel.js");
 const Cabang = require("../../Master/models/Cabang/CabangModel.js");
 const jwt = require("jsonwebtoken");
+const { generateRandomNumberString } = require("../../helper/helper.js");
 
 const updateUser = async (req, res) => {
   let transaction;
@@ -624,6 +625,35 @@ const getNama = async (req, res) => {
   }
 };
 
+const getNpwp = async (req, res) => {
+  try {
+    let makeNpwp;
+    let isUnique = false;
+
+    while (!isUnique) {
+      // Generate a random number string
+      makeNpwp = generateRandomNumberString(15);
+
+      // Check if the generated number already exists in the database
+      const existingUsers = await User.findOne({
+        where: {
+          npwp15: makeNpwp, // Compare with generated npwp
+        },
+      });
+
+      // If no users are found, the value is unique
+      if (!existingUsers) {
+        isUnique = true;
+      }
+    }
+
+    res.status(200).json(makeNpwp);
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getUsersPerCabang = async (req, res) => {
   try {
     let tempAllUser = [];
@@ -841,6 +871,7 @@ module.exports = {
   getUsers,
   getUsersPagination,
   getNama,
+  getNpwp,
   getUsersPerCabang,
   getUsersPerCabangPagination,
   getUsersPerCabangExceptOwnerPagination,

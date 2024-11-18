@@ -7,11 +7,35 @@ const KelompokKegiatanEkonomiKlu = require("../../Master/models/KelompokKegiatan
 const Cabang = require("../../Master/models/Cabang/CabangModel.js");
 const { createError } = require("../../utils/error.js");
 const jwt = require("jsonwebtoken");
+const { generateRandomNumberString } = require("../../helper/helper.js");
 
 const register = async (req, res) => {
   let transaction;
   try {
     transaction = await sequelize.transaction();
+
+    let makeNpwp;
+    let isUnique = false;
+
+    while (!isUnique) {
+      // Generate a random number string
+      makeNpwp = generateRandomNumberString(15);
+
+      // Check if the generated number already exists in the database
+      const existingUsers = await User.findOne({
+        where: {
+          npwp15: makeNpwp, // Compare with generated npwp
+        },
+      });
+
+      // If no users are found, the value is unique
+      if (!existingUsers) {
+        isUnique = true;
+      }
+    }
+    let npwp15 = makeNpwp;
+    let nikNpwp16 = `0${makeNpwp}`;
+    let nitku = `0${makeNpwp}000000`;
 
     let kelompokKegiatanEkonomiKlus = await KelompokKegiatanEkonomiKlu.findOne({
       where: {
@@ -22,6 +46,9 @@ const register = async (req, res) => {
     const newUser = await User.create(
       {
         ...req.body,
+        npwp15,
+        nikNpwp16,
+        nitku,
         kelompokKegiatanEkonomiKluId: kelompokKegiatanEkonomiKlus.id,
         password: req.body.password,
         cabangId: req.body.cabangId,
@@ -46,7 +73,8 @@ const register = async (req, res) => {
     );
 
     await transaction.commit();
-    res.status(200).send(`User ${req.body.npwp15} has been created.`);
+    res.status(200).send(newUser);
+    // res.status(200).send(`User ${req.body.npwp15} has been created.`);
   } catch (error) {
     if (transaction) {
       await transaction.rollback();
