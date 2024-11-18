@@ -92,6 +92,7 @@ const eBupot2126Posting = async (req, res) => {
       where: {
         isBupot2126: true,
       },
+      order: [["kodeObjekPajak", "ASC"]],
     });
 
     let tempNewEBupot2126Posting = [];
@@ -103,6 +104,7 @@ const eBupot2126Posting = async (req, res) => {
         tahunPajak: tahun,
         ebupot2126PenyiapanSptId: findEBupot2126PenyiapanSpt.id,
         objekPajakId: objekPajak.id,
+        jumlahPenerimaPenghasilan: 0,
         jumlahDpp: 0,
         jumlahPph: 0,
         userIdInput: req.body.userId,
@@ -229,6 +231,7 @@ const eBupot2126Posting = async (req, res) => {
       // Update Increment EBupot2126Posting
       await EBupot2126Posting.increment(
         {
+          jumlahPenerimaPenghasilan: 1,
           jumlahDpp: eBupot2126Pph21.jumlahPenghasilan,
           jumlahPph: eBupot2126Pph21.pPhYangDipotongDipungut,
         },
@@ -494,6 +497,7 @@ const eBupot2126Posting = async (req, res) => {
       // Update Increment EBupot2126Posting
       await EBupot2126Posting.increment(
         {
+          jumlahPenerimaPenghasilan: 1,
           jumlahDpp: eBupot2126Pph26.jumlahPenghasilanBruto,
           jumlahPph: eBupot2126Pph26.pPhYangDipotongDipungut,
         },
@@ -585,7 +589,193 @@ const getEBupot2126PostingsByUserSearchPagination = async (req, res) => {
   }
 };
 
+const getEBupot2126PostingsMasaTahunPajak = async (req, res) => {
+  let tempWhere = {
+    userEBupot2126PostingId: req.body.userEBupot2126PostingId,
+    [Op.and]: [
+      {
+        masaPajak: req.body.masaPajak,
+      },
+      {
+        tahunPajak: req.body.tahunPajak,
+      },
+    ],
+  };
+  let tempInclude = [{ model: User }, { model: ObjekPajak }, { model: Cabang }];
+
+  try {
+    const eBupot2126Postings = await EBupot2126Posting.findAll({
+      where: tempWhere,
+      include: tempInclude,
+    });
+
+    let finalEBupot2126Posting = [];
+    for (let eBupot2126Posting of eBupot2126Postings) {
+      if (eBupot2126Posting.objekpajak.kodeObjekPajak === "21-100-01") {
+        const objekPajak = await ObjekPajak.findOne({
+          where: {
+            kodeObjekPajak: "21-100-01",
+          },
+        });
+
+        // 01.) Find Pajak Tahunan
+        let tempWhereTahunan = {
+          userEBupot2126Pph21TahunanId: req.body.userEBupot2126PostingId,
+          tahunPajak: req.body.tahunPajak,
+          objekPajakId: objekPajak.id,
+        };
+        let tempIncludeTahunan = [
+          { model: User },
+          { model: ObjekPajak },
+          { model: Negara },
+          { model: EBupot2126Penandatangan },
+          { model: Cabang },
+        ];
+
+        const eBupot2126Pph21Tahunans = await EBupot2126Pph21Tahunan.findAll({
+          where: tempWhereTahunan,
+          include: tempIncludeTahunan,
+        });
+
+        let jumlahDpp = 0;
+        let jumlahPph = 0;
+        for (let eBupot2126Pph21Tahunan of eBupot2126Pph21Tahunans) {
+          jumlahDpp += eBupot2126Pph21Tahunan.jumlahPenghasilanBruto1sd7;
+          jumlahPph +=
+            eBupot2126Pph21Tahunan.pph21KurangLebihBayarMasaPajakTerakhir;
+        }
+
+        // 02.) Find Pajak Bulanan
+        let tempWhereBulanan = {
+          userEBupot2126Pph21Id: req.body.userEBupot2126PostingId,
+          [Op.and]: [
+            {
+              bulanPajak: req.body.masaPajak,
+            },
+            {
+              tahunPajak: req.body.tahunPajak,
+            },
+          ],
+          [Op.or]: [
+            {
+              "$objekpajak.kodeObjekPajak$": "21-100-01",
+            },
+          ],
+        };
+        let tempIncludeBulanan = [
+          { model: User },
+          { model: EBupot2126Penandatangan },
+          { model: ObjekPajak, as: "objekpajak" },
+          { model: Cabang },
+        ];
+
+        const eBupot2126Pph21s = await EBupot2126Pph21.findAll({
+          where: tempWhereBulanan,
+          include: tempIncludeBulanan,
+        });
+
+        for (let eBupot2126Pph21 of eBupot2126Pph21s) {
+          jumlahDpp += eBupot2126Pph21.jumlahPenghasilan;
+          jumlahPph += eBupot2126Pph21.pPhYangDipotongDipungut;
+        }
+
+        let objectPosting = {
+          ...eBupot2126Posting.dataValues,
+          jumlahDpp,
+          jumlahPph,
+        };
+        finalEBupot2126Posting.push(objectPosting);
+      } else if (eBupot2126Posting.objekpajak.kodeObjekPajak === "21-100-02") {
+        const objekPajak = await ObjekPajak.findOne({
+          where: {
+            kodeObjekPajak: "21-100-02",
+          },
+        });
+
+        // 01.) Find Pajak Tahunan
+        let tempWhereTahunan = {
+          userEBupot2126Pph21TahunanId: req.body.userEBupot2126PostingId,
+          tahunPajak: req.body.tahunPajak,
+          objekPajakId: objekPajak.id,
+        };
+        let tempIncludeTahunan = [
+          { model: User },
+          { model: ObjekPajak },
+          { model: Negara },
+          { model: EBupot2126Penandatangan },
+          { model: Cabang },
+        ];
+
+        const eBupot2126Pph21Tahunans = await EBupot2126Pph21Tahunan.findAll({
+          where: tempWhereTahunan,
+          include: tempIncludeTahunan,
+        });
+
+        let jumlahDpp = 0;
+        let jumlahPph = 0;
+        for (let eBupot2126Pph21Tahunan of eBupot2126Pph21Tahunans) {
+          jumlahDpp += eBupot2126Pph21Tahunan.jumlahPenghasilanBruto1sd7;
+          jumlahPph +=
+            eBupot2126Pph21Tahunan.pph21KurangLebihBayarMasaPajakTerakhir;
+        }
+
+        // 02.) Find Pajak Bulanan
+        let tempWhereBulanan = {
+          userEBupot2126Pph21Id: req.body.userEBupot2126PostingId,
+          [Op.and]: [
+            {
+              bulanPajak: req.body.masaPajak,
+            },
+            {
+              tahunPajak: req.body.tahunPajak,
+            },
+          ],
+          [Op.or]: [
+            {
+              "$objekpajak.kodeObjekPajak$": "21-100-02",
+            },
+          ],
+        };
+        let tempIncludeBulanan = [
+          { model: User },
+          { model: EBupot2126Penandatangan },
+          { model: ObjekPajak, as: "objekpajak" },
+          { model: Cabang },
+        ];
+
+        const eBupot2126Pph21s = await EBupot2126Pph21.findAll({
+          where: tempWhereBulanan,
+          include: tempIncludeBulanan,
+        });
+
+        for (let eBupot2126Pph21 of eBupot2126Pph21s) {
+          jumlahDpp += eBupot2126Pph21.jumlahPenghasilan;
+          jumlahPph += eBupot2126Pph21.pPhYangDipotongDipungut;
+        }
+
+        let objectPosting = {
+          ...eBupot2126Posting.dataValues,
+          jumlahDpp,
+          jumlahPph,
+        };
+        finalEBupot2126Posting.push(objectPosting);
+      } else {
+        finalEBupot2126Posting.push({
+          ...eBupot2126Posting.dataValues,
+        });
+      }
+    }
+
+    // res.status(200).json(eBupot2126Postings);
+    res.status(200).json(finalEBupot2126Posting);
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   eBupot2126Posting,
   getEBupot2126PostingsByUserSearchPagination,
+  getEBupot2126PostingsMasaTahunPajak,
 };

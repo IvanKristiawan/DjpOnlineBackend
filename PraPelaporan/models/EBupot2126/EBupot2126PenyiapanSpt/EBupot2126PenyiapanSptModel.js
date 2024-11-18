@@ -29,6 +29,129 @@ const EBupot2126PenyiapanSpt = sequelize.define(
       allowNull: false,
     },
 
+    pph21Dtp: {
+      type: DataTypes.DOUBLE,
+      defaultValue: 0,
+      allowNull: false,
+    },
+    stpPph: {
+      type: DataTypes.DOUBLE,
+      defaultValue: 0,
+      allowNull: false,
+    },
+    kelebihanSetorJanuari: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    kelebihanSetorFebruari: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    kelebihanSetorMaret: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    kelebihanSetorApril: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    kelebihanSetorMei: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    kelebihanSetorJuni: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    kelebihanSetorJuli: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    kelebihanSetorAgustus: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    kelebihanSetorSeptember: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    kelebihanSetorOktober: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    kelebihanSetorNovember: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    kelebihanSetorDesember: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+
+    tahunPajakPenyiapanSpt: {
+      type: DataTypes.STRING,
+      default: "",
+      allowNull: true,
+    },
+    kelebihanSetor: {
+      type: DataTypes.DOUBLE,
+      defaultValue: 0,
+      allowNull: false,
+    },
+    keterangan: {
+      type: DataTypes.STRING,
+      default: "",
+      allowNull: true,
+    },
+    jumlahAngka1213: {
+      type: DataTypes.DOUBLE,
+      defaultValue: 0,
+      allowNull: false,
+    },
+    tempTotalKurangAtauLebih: {
+      type: DataTypes.DOUBLE,
+      defaultValue: 0,
+      allowNull: false,
+    },
+    totalKurangAtauLebih: {
+      type: DataTypes.DOUBLE,
+      defaultValue: 0,
+      allowNull: false,
+    },
+    totalKurangAtauLebihPadaSptYangDibetulkan: {
+      type: DataTypes.DOUBLE,
+      defaultValue: 0,
+      allowNull: false,
+    },
+    totalKurangAtauLebihKarenaPembetulan: {
+      type: DataTypes.DOUBLE,
+      defaultValue: 0,
+      allowNull: false,
+    },
+
+    masaPajakKompensasi: {
+      type: DataTypes.STRING,
+      default: "",
+      allowNull: true,
+    },
+    tahunPajakKompensasi: {
+      type: DataTypes.STRING,
+      default: "",
+      allowNull: true,
+    },
+
     statusSpt: {
       type: DataTypes.STRING,
       default: "Draft",

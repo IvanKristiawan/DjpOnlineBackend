@@ -48,6 +48,7 @@ const getObjekPajaksBupot2126 = async (req, res) => {
     const objekPajaks = await ObjekPajak.findAll({
       where: {
         untukBupot2126: req.body.untukBupot2126,
+        isActiveBupot2126: req.body.isActiveBupot2126,
       },
       order: [["kodeObjekPajak", "ASC"]],
       include: [{ model: JenisSetoran }, { model: Cabang }],

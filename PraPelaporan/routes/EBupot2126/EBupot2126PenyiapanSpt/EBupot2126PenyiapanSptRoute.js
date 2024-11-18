@@ -6,10 +6,10 @@ const getEBupot2126PenyiapanSptsPagination =
   controller.getEBupot2126PenyiapanSptsPagination;
 const getEBupot2126PenyiapanSptsByUserPagination =
   controller.getEBupot2126PenyiapanSptsByUserPagination;
-// const getEBupot2126PenyiapanSptsByUserSearchPagination =
-//   controller.getEBupot2126PenyiapanSptsByUserSearchPagination;
-// const getEBupot2126PenyiapanSptsTerkirimByUserSearchPagination =
-//   controller.getEBupot2126PenyiapanSptsTerkirimByUserSearchPagination;
+const getEBupot2126PenyiapanSptsByUserSearchPagination =
+  controller.getEBupot2126PenyiapanSptsByUserSearchPagination;
+const getEBupot2126PenyiapanSptsTerkirimByUserSearchPagination =
+  controller.getEBupot2126PenyiapanSptsTerkirimByUserSearchPagination;
 const getEBupot2126PenyiapanSptById = controller.getEBupot2126PenyiapanSptById;
 const saveEBupot2126PenyiapanSpt = controller.saveEBupot2126PenyiapanSpt;
 const kirimSptEBupot2126PenyiapanSpt =
@@ -33,16 +33,16 @@ router.post(
   verifyUser,
   getEBupot2126PenyiapanSptsByUserPagination
 );
-// router.post(
-//   "/eBupot2126PenyiapanSptsByUserSearchPagination",
-//   verifyUser,
-//   getEBupot2126PenyiapanSptsByUserSearchPagination
-// );
-// router.post(
-//   "/eBupot2126PenyiapanSptsTerkirimByUserSearchPagination",
-//   verifyUser,
-//   getEBupot2126PenyiapanSptsTerkirimByUserSearchPagination
-// );
+router.post(
+  "/eBupot2126PenyiapanSptsByUserSearchPagination",
+  verifyUser,
+  getEBupot2126PenyiapanSptsByUserSearchPagination
+);
+router.post(
+  "/eBupot2126PenyiapanSptsTerkirimByUserSearchPagination",
+  verifyUser,
+  getEBupot2126PenyiapanSptsTerkirimByUserSearchPagination
+);
 router.post(
   "/eBupot2126PenyiapanSpts/:id",
   verifyUser,

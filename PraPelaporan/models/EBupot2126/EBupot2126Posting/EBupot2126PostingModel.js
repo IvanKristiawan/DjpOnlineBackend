@@ -40,14 +40,19 @@ const EBupot2126Posting = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    jumlahPenerimaPenghasilan: {
+      type: DataTypes.DOUBLE,
+      defaultValue: 0,
+      allowNull: false,
+    },
     jumlahDpp: {
       type: DataTypes.DOUBLE,
-      default: 0,
+      defaultValue: 0,
       allowNull: false,
     },
     jumlahPph: {
       type: DataTypes.DOUBLE,
-      default: 0,
+      defaultValue: 0,
       allowNull: false,
     },
 

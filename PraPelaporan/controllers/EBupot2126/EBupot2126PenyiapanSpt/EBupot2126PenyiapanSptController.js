@@ -5,7 +5,7 @@ const EBupot2126PenyiapanSpt = require("../../../models/EBupot2126/EBupot2126Pen
 const User = require("../../../../User/models/UserModel.js");
 const EBupot2126Penandatangan = require("../../../models/EBupot2126/Penandatangan/EBupot2126PenandatanganModel.js");
 const Cabang = require("../../../../Master/models/Cabang/CabangModel.js");
-// const EBupot2126TagihanPemotongan = require("../../../models/EBupot2126/EBupot2126TagihanPemotongan/EBupot2126TagihanPemotonganModel.js");
+const EBupot2126TagihanPemotongan = require("../../../models/EBupot2126/EBupot2126TagihanPemotongan/EBupot2126TagihanPemotonganModel.js");
 const EBupot2126Posting = require("../../../models/EBupot2126/EBupot2126Posting/EBupot2126PostingModel.js");
 const ObjekPajak = require("../../../../Master/models/ObjekPajak/ObjekPajakModel.js");
 const JenisSetoran = require("../../../../Master/models/JenisSetoran/JenisSetoranModel.js");
@@ -121,214 +121,197 @@ const getEBupot2126PenyiapanSptsByUserPagination = async (req, res) => {
   }
 };
 
-// const getEBupot2126PenyiapanSptsByUserSearchPagination = async (
-//   req,
-//   res
-// ) => {
-//   const page = parseInt(req.query.page) || 0;
-//   const limit = parseInt(req.query.limit) || 10;
-//   const search = req.query.search_query || "";
-//   const offset = limit * page;
+const getEBupot2126PenyiapanSptsByUserSearchPagination = async (req, res) => {
+  const page = parseInt(req.query.page) || 0;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search_query || "";
+  const offset = limit * page;
 
-//   let tempWhere = {
-//     userEBupot2126PenyiapanSptId:
-//       req.body.userEBupot2126PenyiapanSptId,
-//   };
-//   let tempInclude = [
-//     { model: User },
-//     { model: EBupot2126Penandatangan },
-//     { model: Cabang },
-//   ];
+  let tempWhere = {
+    userEBupot2126PenyiapanSptId: req.body.userEBupot2126PenyiapanSptId,
+  };
+  let tempInclude = [
+    { model: User },
+    { model: EBupot2126Penandatangan },
+    { model: Cabang },
+  ];
 
-//   const totalRows = await EBupot2126PenyiapanSpt.count({
-//     where: tempWhere,
-//     include: tempInclude,
-//   });
-//   const totalPage = Math.ceil(totalRows / limit);
-//   try {
-//     const eBupot2126PenyiapanSpts =
-//       await EBupot2126PenyiapanSpt.findAll({
-//         where: tempWhere,
-//         include: tempInclude,
-//         offset: offset,
-//         limit: limit,
-//       });
-//     // console.log(eBupot2126PenyiapanSpts.length);
+  const totalRows = await EBupot2126PenyiapanSpt.count({
+    where: tempWhere,
+    include: tempInclude,
+  });
+  const totalPage = Math.ceil(totalRows / limit);
+  try {
+    const eBupot2126PenyiapanSpts = await EBupot2126PenyiapanSpt.findAll({
+      where: tempWhere,
+      include: tempInclude,
+      offset: offset,
+      limit: limit,
+    });
+    // console.log(eBupot2126PenyiapanSpts.length);
 
-//     let tempEBupot2126PenyiapanSpts = [];
-//     for (let eBupot2126PenyiapanSpt of eBupot2126PenyiapanSpts) {
-//       const eBupot2126TagihanPemotongans =
-//         await EBupot2126TagihanPemotongan.findAll({
-//           where: {
-//             ebupot2126PenyiapanSptId: eBupot2126PenyiapanSpt.id,
-//           },
-//           include: [
-//             { model: User },
-//             {
-//               model: ObjekPajak,
-//               include: [
-//                 {
-//                   model: JenisSetoran,
-//                   as: "jenissetoran",
-//                   include: [
-//                     {
-//                       model: JenisPajak,
-//                       as: "jenispajak",
-//                     },
-//                   ],
-//                 },
-//               ],
-//             },
-//             { model: Cabang },
-//           ],
-//         });
+    let tempEBupot2126PenyiapanSpts = [];
+    for (let eBupot2126PenyiapanSpt of eBupot2126PenyiapanSpts) {
+      const eBupot2126TagihanPemotongans =
+        await EBupot2126TagihanPemotongan.findAll({
+          where: {
+            ebupot2126PenyiapanSptId: eBupot2126PenyiapanSpt.id,
+          },
+          include: [
+            { model: User },
+            {
+              model: JenisSetoran,
+              as: "jenissetoran",
+              include: [
+                {
+                  model: JenisPajak,
+                  as: "jenispajak",
+                },
+              ],
+            },
+            { model: Cabang },
+          ],
+        });
 
-//       // Use map and reduce to calculate the total pphYangDipotong
-//       const totalPphYangDipotong = eBupot2126TagihanPemotongans
-//         .map((record) => record.pphYangDipotong) // Extract the 'pphYangDipotong' field
-//         .reduce((acc, curr) => acc + curr, 0); // Sum all values
+      // Use map and reduce to calculate the total pphYangDipotong
+      const totalPphYangDipotong = eBupot2126TagihanPemotongans
+        .map((record) => record.pphYangDipotong) // Extract the 'pphYangDipotong' field
+        .reduce((acc, curr) => acc + curr, 0); // Sum all values
 
-//       // Use map and reduce to calculate the total pphYangDisetor
-//       const totalPphYangDisetor = eBupot2126TagihanPemotongans
-//         .map((record) => record.pphYangDisetor) // Extract the 'pphYangDipotong' field
-//         .reduce((acc, curr) => acc + curr, 0); // Sum all values
+      // Use map and reduce to calculate the total pphYangDisetor
+      const totalPphYangDisetor = eBupot2126TagihanPemotongans
+        .map((record) => record.pphYangDisetor) // Extract the 'pphYangDipotong' field
+        .reduce((acc, curr) => acc + curr, 0); // Sum all values
 
-//       let jumlahPphKurangSetor = totalPphYangDipotong - totalPphYangDisetor;
-//       let keteranganSpt = "";
-//       if (jumlahPphKurangSetor === 0) {
-//         keteranganSpt = "SPT Anda siap kirim";
-//       } else {
-//         keteranganSpt =
-//           "Terdapat Kekurangan Setor, Silahkan cek kembali SPT Anda.";
-//       }
+      let jumlahPphKurangSetor = totalPphYangDipotong - totalPphYangDisetor;
+      let keteranganSpt = "";
+      if (jumlahPphKurangSetor === 0) {
+        keteranganSpt = "SPT Anda siap kirim";
+      } else {
+        keteranganSpt =
+          "Terdapat Kekurangan Setor, Silahkan cek kembali SPT Anda.";
+      }
 
-//       let objectData = {
-//         ...eBupot2126PenyiapanSpt.dataValues,
-//         jumlahPphKurangSetor: totalPphYangDipotong - totalPphYangDisetor,
-//         keteranganSpt,
-//       };
+      let objectData = {
+        ...eBupot2126PenyiapanSpt.dataValues,
+        jumlahPphKurangSetor: totalPphYangDipotong - totalPphYangDisetor,
+        keteranganSpt,
+      };
 
-//       tempEBupot2126PenyiapanSpts.push(objectData);
-//     }
+      tempEBupot2126PenyiapanSpts.push(objectData);
+    }
 
-//     res.status(200).json({
-//       eBupot2126PenyiapanSpts: tempEBupot2126PenyiapanSpts,
-//       page: page,
-//       limit: limit,
-//       totalRows: totalRows,
-//       totalPage: totalPage,
-//     });
-//   } catch (error) {
-//     // Error 500 = Kesalahan di server
-//     res.status(500).json({ message: error.message });
-//   }
-// };
+    res.status(200).json({
+      eBupot2126PenyiapanSpts: tempEBupot2126PenyiapanSpts,
+      page: page,
+      limit: limit,
+      totalRows: totalRows,
+      totalPage: totalPage,
+    });
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
 
-// const getEBupot2126PenyiapanSptsTerkirimByUserSearchPagination = async (
-//   req,
-//   res
-// ) => {
-//   const page = parseInt(req.query.page) || 0;
-//   const limit = parseInt(req.query.limit) || 10;
-//   const search = req.query.search_query || "";
-//   const offset = limit * page;
+const getEBupot2126PenyiapanSptsTerkirimByUserSearchPagination = async (
+  req,
+  res
+) => {
+  const page = parseInt(req.query.page) || 0;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search_query || "";
+  const offset = limit * page;
 
-//   let tempWhere = {
-//     userEBupot2126PenyiapanSptId:
-//       req.body.userEBupot2126PenyiapanSptId,
-//     noBpeNtte: {
-//       [Op.ne]: "",
-//     },
-//   };
-//   let tempInclude = [
-//     { model: User },
-//     { model: EBupot2126Penandatangan },
-//     { model: Cabang },
-//   ];
+  let tempWhere = {
+    userEBupot2126PenyiapanSptId: req.body.userEBupot2126PenyiapanSptId,
+    noBpeNtte: {
+      [Op.ne]: "",
+    },
+  };
+  let tempInclude = [
+    { model: User },
+    { model: EBupot2126Penandatangan },
+    { model: Cabang },
+  ];
 
-//   const totalRows = await EBupot2126PenyiapanSpt.count({
-//     where: tempWhere,
-//     include: tempInclude,
-//   });
-//   const totalPage = Math.ceil(totalRows / limit);
-//   try {
-//     const eBupot2126PenyiapanSpts =
-//       await EBupot2126PenyiapanSpt.findAll({
-//         where: tempWhere,
-//         include: tempInclude,
-//         offset: offset,
-//         limit: limit,
-//       });
-//     // console.log(eBupot2126PenyiapanSpts.length);
+  const totalRows = await EBupot2126PenyiapanSpt.count({
+    where: tempWhere,
+    include: tempInclude,
+  });
+  const totalPage = Math.ceil(totalRows / limit);
+  try {
+    const eBupot2126PenyiapanSpts = await EBupot2126PenyiapanSpt.findAll({
+      where: tempWhere,
+      include: tempInclude,
+      offset: offset,
+      limit: limit,
+    });
+    // console.log(eBupot2126PenyiapanSpts.length);
 
-//     let tempEBupot2126PenyiapanSpts = [];
-//     for (let eBupot2126PenyiapanSpt of eBupot2126PenyiapanSpts) {
-//       const eBupot2126TagihanPemotongans =
-//         await EBupot2126TagihanPemotongan.findAll({
-//           where: {
-//             ebupot2126PenyiapanSptId: eBupot2126PenyiapanSpt.id,
-//           },
-//           include: [
-//             { model: User },
-//             {
-//               model: ObjekPajak,
-//               include: [
-//                 {
-//                   model: JenisSetoran,
-//                   as: "jenissetoran",
-//                   include: [
-//                     {
-//                       model: JenisPajak,
-//                       as: "jenispajak",
-//                     },
-//                   ],
-//                 },
-//               ],
-//             },
-//             { model: Cabang },
-//           ],
-//         });
+    let tempEBupot2126PenyiapanSpts = [];
+    for (let eBupot2126PenyiapanSpt of eBupot2126PenyiapanSpts) {
+      const eBupot2126TagihanPemotongans =
+        await EBupot2126TagihanPemotongan.findAll({
+          where: {
+            ebupot2126PenyiapanSptId: eBupot2126PenyiapanSpt.id,
+          },
+          include: [
+            { model: User },
+            {
+              model: JenisSetoran,
+              as: "jenissetoran",
+              include: [
+                {
+                  model: JenisPajak,
+                  as: "jenispajak",
+                },
+              ],
+            },
+            { model: Cabang },
+          ],
+        });
 
-//       // Use map and reduce to calculate the total pphYangDipotong
-//       const totalPphYangDipotong = eBupot2126TagihanPemotongans
-//         .map((record) => record.pphYangDipotong) // Extract the 'pphYangDipotong' field
-//         .reduce((acc, curr) => acc + curr, 0); // Sum all values
+      // Use map and reduce to calculate the total pphYangDipotong
+      const totalPphYangDipotong = eBupot2126TagihanPemotongans
+        .map((record) => record.pphYangDipotong) // Extract the 'pphYangDipotong' field
+        .reduce((acc, curr) => acc + curr, 0); // Sum all values
 
-//       // Use map and reduce to calculate the total pphYangDisetor
-//       const totalPphYangDisetor = eBupot2126TagihanPemotongans
-//         .map((record) => record.pphYangDisetor) // Extract the 'pphYangDipotong' field
-//         .reduce((acc, curr) => acc + curr, 0); // Sum all values
+      // Use map and reduce to calculate the total pphYangDisetor
+      const totalPphYangDisetor = eBupot2126TagihanPemotongans
+        .map((record) => record.pphYangDisetor) // Extract the 'pphYangDipotong' field
+        .reduce((acc, curr) => acc + curr, 0); // Sum all values
 
-//       let jumlahPphKurangSetor = totalPphYangDipotong - totalPphYangDisetor;
-//       let keteranganSpt = "";
-//       if (jumlahPphKurangSetor === 0) {
-//         keteranganSpt = "SPT Anda siap kirim";
-//       } else {
-//         keteranganSpt =
-//           "Terdapat Kekurangan Setor, Silahkan cek kembali SPT Anda.";
-//       }
+      let jumlahPphKurangSetor = totalPphYangDipotong - totalPphYangDisetor;
+      let keteranganSpt = "";
+      if (jumlahPphKurangSetor === 0) {
+        keteranganSpt = "SPT Anda siap kirim";
+      } else {
+        keteranganSpt =
+          "Terdapat Kekurangan Setor, Silahkan cek kembali SPT Anda.";
+      }
 
-//       let objectData = {
-//         ...eBupot2126PenyiapanSpt.dataValues,
-//         jumlahPphKurangSetor: totalPphYangDipotong - totalPphYangDisetor,
-//         keteranganSpt,
-//       };
+      let objectData = {
+        ...eBupot2126PenyiapanSpt.dataValues,
+        jumlahPphKurangSetor: totalPphYangDipotong - totalPphYangDisetor,
+        keteranganSpt,
+      };
 
-//       tempEBupot2126PenyiapanSpts.push(objectData);
-//     }
+      tempEBupot2126PenyiapanSpts.push(objectData);
+    }
 
-//     res.status(200).json({
-//       eBupot2126PenyiapanSpts: tempEBupot2126PenyiapanSpts,
-//       page: page,
-//       limit: limit,
-//       totalRows: totalRows,
-//       totalPage: totalPage,
-//     });
-//   } catch (error) {
-//     // Error 500 = Kesalahan di server
-//     res.status(500).json({ message: error.message });
-//   }
-// };
+    res.status(200).json({
+      eBupot2126PenyiapanSpts: tempEBupot2126PenyiapanSpts,
+      page: page,
+      limit: limit,
+      totalRows: totalRows,
+      totalPage: totalPage,
+    });
+  } catch (error) {
+    // Error 500 = Kesalahan di server
+    res.status(500).json({ message: error.message });
+  }
+};
 
 const getEBupot2126PenyiapanSptById = async (req, res) => {
   try {
@@ -507,7 +490,7 @@ const updateEBupot2126PenyiapanSpt = async (req, res) => {
     // 01.) Find EBupot2126Penandatangan
     let findPenandatangan = await EBupot2126Penandatangan.findOne({
       where: {
-        userPenandatanganId: req.body.userId,
+        userEBupot2126PenandatanganId: req.body.userId,
         namaIdentitas: req.body.namaIdentitas,
       },
     });
@@ -516,7 +499,7 @@ const updateEBupot2126PenyiapanSpt = async (req, res) => {
     let updatedEBupot2126PenyiapanSpt = await EBupot2126PenyiapanSpt.update(
       {
         ...req.body,
-        penandatanganId: findPenandatangan.id,
+        eBupot2126PenandatanganId: findPenandatangan.id,
       },
       {
         where: {
@@ -525,29 +508,6 @@ const updateEBupot2126PenyiapanSpt = async (req, res) => {
         transaction,
       }
     );
-
-    // 03.) Update E-Bupot 2126 Posting
-    const eBupot2126Postings = Object.entries(req.body.eBupot2126Posting).map(
-      ([id, values]) => ({
-        id,
-        ...values,
-      })
-    );
-
-    for (let eBupot2126Posting of eBupot2126Postings) {
-      await EBupot2126Posting.update(
-        {
-          jumlahDpp: eBupot2126Posting.jumlahDpp,
-          jumlahPph: eBupot2126Posting.jumlahPph,
-        },
-        {
-          where: {
-            id: eBupot2126Posting.id,
-          },
-          transaction,
-        }
-      );
-    }
 
     // Status 201 = Created
     await transaction.commit();
@@ -590,8 +550,8 @@ module.exports = {
   getEBupot2126PenyiapanSpts,
   getEBupot2126PenyiapanSptsPagination,
   getEBupot2126PenyiapanSptsByUserPagination,
-  // getEBupot2126PenyiapanSptsByUserSearchPagination,
-  // getEBupot2126PenyiapanSptsTerkirimByUserSearchPagination,
+  getEBupot2126PenyiapanSptsByUserSearchPagination,
+  getEBupot2126PenyiapanSptsTerkirimByUserSearchPagination,
   getEBupot2126PenyiapanSptById,
   saveEBupot2126PenyiapanSpt,
   kirimSptEBupot2126PenyiapanSpt,

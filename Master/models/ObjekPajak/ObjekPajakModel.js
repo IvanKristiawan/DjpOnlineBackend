@@ -60,6 +60,11 @@ const ObjekPajak = sequelize.define(
       defaultValue: false,
       allowNull: false,
     },
+    isActiveBupot2126: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
     untukBupot2126: {
       type: DataTypes.STRING, // PPh 21, PPh 26
       default: "",

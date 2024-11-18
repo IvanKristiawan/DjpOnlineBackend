@@ -42,12 +42,12 @@ const EBupotUnifikasiPosting = sequelize.define(
     },
     jumlahDpp: {
       type: DataTypes.DOUBLE,
-      default: 0,
+      defaultValue: 0,
       allowNull: false,
     },
     jumlahPph: {
       type: DataTypes.DOUBLE,
-      default: 0,
+      defaultValue: 0,
       allowNull: false,
     },
 
