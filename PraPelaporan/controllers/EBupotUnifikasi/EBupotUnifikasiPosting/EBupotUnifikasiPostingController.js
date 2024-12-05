@@ -54,7 +54,8 @@ const eBupotUnifikasiPosting = async (req, res) => {
             tahunPajak: tahun,
             pembetulanKe: 0,
             statusSpt: "Draft",
-            keteranganSpt: "",
+            keteranganSpt:
+              "Data SPT Belum dilengkapi. Silahkan cek Kembali SPT Anda.",
             userIdInput: req.body.userId,
             cabangId: req.body.kodeCabang,
           },

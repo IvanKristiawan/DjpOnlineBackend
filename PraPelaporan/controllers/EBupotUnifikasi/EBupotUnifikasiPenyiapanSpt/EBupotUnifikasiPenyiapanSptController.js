@@ -197,10 +197,14 @@ const getEBupotUnifikasiPenyiapanSptsByUserSearchPagination = async (
         .reduce((acc, curr) => acc + curr, 0); // Sum all values
 
       let jumlahPphKurangSetor = totalPphYangDipotong - totalPphYangDisetor;
-      let keteranganSpt = "";
-      if (jumlahPphKurangSetor === 0) {
-        keteranganSpt = "SPT Anda siap kirim";
-      } else {
+      let keteranganSpt = eBupotUnifikasiPenyiapanSpt.dataValues.keteranganSpt;
+      // if (jumlahPphKurangSetor === 0) {
+      //   keteranganSpt = "SPT Anda siap kirim";
+      // } else {
+      //   keteranganSpt =
+      //     "Terdapat Kekurangan Setor, Silahkan cek kembali SPT Anda.";
+      // }
+      if (jumlahPphKurangSetor !== 0) {
         keteranganSpt =
           "Terdapat Kekurangan Setor, Silahkan cek kembali SPT Anda.";
       }
@@ -303,10 +307,14 @@ const getEBupotUnifikasiPenyiapanSptsTerkirimByUserSearchPagination = async (
         .reduce((acc, curr) => acc + curr, 0); // Sum all values
 
       let jumlahPphKurangSetor = totalPphYangDipotong - totalPphYangDisetor;
-      let keteranganSpt = "";
-      if (jumlahPphKurangSetor === 0) {
-        keteranganSpt = "SPT Anda siap kirim";
-      } else {
+      let keteranganSpt = eBupotUnifikasiPenyiapanSpt.dataValues.keteranganSpt;
+      // if (jumlahPphKurangSetor === 0) {
+      //   keteranganSpt = "SPT Anda siap kirim";
+      // } else {
+      //   keteranganSpt =
+      //     "Terdapat Kekurangan Setor, Silahkan cek kembali SPT Anda.";
+      // }
+      if (jumlahPphKurangSetor !== 0) {
         keteranganSpt =
           "Terdapat Kekurangan Setor, Silahkan cek kembali SPT Anda.";
       }
@@ -580,6 +588,8 @@ const kirimSptEBupotUnifikasiPenyiapanSpt = async (req, res) => {
           {
             noBpeNtte: tempNoBpeNtte,
             tanggalKirim: new Date(),
+            statusSpt: "Sudah Lapor",
+            keteranganSpt: "SPT Anda berhasil dikirim",
           },
           {
             where: {
@@ -602,6 +612,8 @@ const kirimSptEBupotUnifikasiPenyiapanSpt = async (req, res) => {
         await EBupotUnifikasiPenyiapanSpt.update(
           {
             tanggalKirim: new Date(),
+            statusSpt: "Sudah Lapor",
+            keteranganSpt: "SPT Anda berhasil dikirim",
           },
           {
             where: {
@@ -684,6 +696,7 @@ const updateEBupotUnifikasiPenyiapanSpt = async (req, res) => {
       await EBupotUnifikasiPenyiapanSpt.update(
         {
           ...req.body,
+          keteranganSpt: "SPT Anda siap kirim",
           penandatanganId: findPenandatangan.id,
         },
         {

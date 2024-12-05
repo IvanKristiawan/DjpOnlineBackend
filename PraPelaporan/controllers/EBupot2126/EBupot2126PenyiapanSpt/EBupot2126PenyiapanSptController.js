@@ -184,10 +184,14 @@ const getEBupot2126PenyiapanSptsByUserSearchPagination = async (req, res) => {
         .reduce((acc, curr) => acc + curr, 0); // Sum all values
 
       let jumlahPphKurangSetor = totalPphYangDipotong - totalPphYangDisetor;
-      let keteranganSpt = "";
-      if (jumlahPphKurangSetor === 0) {
-        keteranganSpt = "SPT Anda siap kirim";
-      } else {
+      let keteranganSpt = eBupot2126PenyiapanSpt.dataValues.keteranganSpt;
+      // if (jumlahPphKurangSetor === 0) {
+      //   keteranganSpt = "SPT Anda siap kirim";
+      // } else {
+      //   keteranganSpt =
+      //     "Terdapat Kekurangan Setor, Silahkan cek kembali SPT Anda.";
+      // }
+      if (jumlahPphKurangSetor !== 0) {
         keteranganSpt =
           "Terdapat Kekurangan Setor, Silahkan cek kembali SPT Anda.";
       }
@@ -283,10 +287,14 @@ const getEBupot2126PenyiapanSptsTerkirimByUserSearchPagination = async (
         .reduce((acc, curr) => acc + curr, 0); // Sum all values
 
       let jumlahPphKurangSetor = totalPphYangDipotong - totalPphYangDisetor;
-      let keteranganSpt = "";
-      if (jumlahPphKurangSetor === 0) {
-        keteranganSpt = "SPT Anda siap kirim";
-      } else {
+      let keteranganSpt = eBupot2126PenyiapanSpt.dataValues.keteranganSpt;
+      // if (jumlahPphKurangSetor === 0) {
+      //   keteranganSpt = "SPT Anda siap kirim";
+      // } else {
+      //   keteranganSpt =
+      //     "Terdapat Kekurangan Setor, Silahkan cek kembali SPT Anda.";
+      // }
+      if (jumlahPphKurangSetor !== 0) {
         keteranganSpt =
           "Terdapat Kekurangan Setor, Silahkan cek kembali SPT Anda.";
       }
@@ -398,6 +406,8 @@ const kirimSptEBupot2126PenyiapanSpt = async (req, res) => {
         {
           noBpeNtte: tempNoBpeNtte,
           tanggalKirim: new Date(),
+          statusSpt: "Sudah Lapor",
+          keteranganSpt: "SPT Anda berhasil dikirim",
         },
         {
           where: {
@@ -419,6 +429,8 @@ const kirimSptEBupot2126PenyiapanSpt = async (req, res) => {
       let updatedEBupot2126PenyiapanSpt = await EBupot2126PenyiapanSpt.update(
         {
           tanggalKirim: new Date(),
+          statusSpt: "Sudah Lapor",
+          keteranganSpt: "SPT Anda berhasil dikirim",
         },
         {
           where: {
@@ -500,6 +512,8 @@ const updateEBupot2126PenyiapanSpt = async (req, res) => {
       {
         ...req.body,
         eBupot2126PenandatanganId: findPenandatangan.id,
+        statusSpt: "Draft",
+        keteranganSpt: "SPT Anda siap kirim",
       },
       {
         where: {
